@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <title>Hello Santa!</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    </header>
+    <body class="page-container">
+        <nav>
+            <ul class="navigation">
+                <li><a href="/">Home</a></li>
+                <li><a href="https://github.com/burningskies42">Contact me</a></li>
+            </ul>
+        </nav>
+        <div class="content-wrap">
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2020 BurningSkies_1337 GmbH</p>
+        </footer>
+    </body>
+</html>
