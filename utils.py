@@ -2,7 +2,8 @@ import pandas as pd
 
 
 def read_address_table():
-    return pd.read_csv('addresses.csv', sep=";")
+    return pd.read_csv("addresses.csv", sep=";")
+
 
 def add_to_table(name, address):
     name = name.replace(";", "")
