@@ -2,6 +2,7 @@ import os
 import random
 
 from flask import Flask, redirect, render_template, request, url_for
+from loguru import logger
 
 from utils import add_to_table, read_address_table
 
@@ -47,13 +48,10 @@ def draw_name():
     elif request.method == "POST":
         user_id = request.form["name_selection"]
         addresses_df = read_address_table().drop(int(user_id))
-        print(f"User {int(user_id)} excluded from selction")
-
+        logger.info(f"User {int(user_id)} excluded from selction")
         target = random.choice(addresses_df.index.values)
-        print(f"{target} was randomly drawn")
-        print(addresses_df.to_string())
+        logger.info(f"{target} was randomly drawn")
         target_data = addresses_df.loc[target]
-
         return f"You have drawn {target_data['Name']}.<br>Posting Address is:<br>{target_data['Address']}"
 
 
