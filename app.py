@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 
 # define routes
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["POST", "GET"])
 def index():
     if "go_to_submit" in request.form:
         return redirect(url_for("submit_address"))
@@ -19,7 +19,7 @@ def index():
     return render_template("home.html")
 
 
-@app.route("/submit", methods=["POST"])
+@app.route("/submit", methods=["GET", "POST"])
 def submit_address():
     if request.method == "POST":
         name = request.form["name"]
@@ -28,36 +28,33 @@ def submit_address():
         processed_text = f"Thank you {name.title()}!<br>\n your data has been submitted"
         return processed_text
 
-    else:
+    elif request.method == "GET":
         return render_template("address_form.html")
 
 
-@app.route("/addresses")
+@app.route("/addresses", methods=["GET"])
 def show_tables():
     return read_address_table().to_html()
 
 
-@app.route("/draw")
+@app.route("/draw", methods=["GET", "POST"])
 def draw_name():
-    name_list = read_address_table()["Name"].values.tolist()
-    name_list = [{"id": i, "val": v} for i, v in enumerate(name_list)]
+    if request.method == "GET":
+        name_list = read_address_table()["Name"].values.tolist()
+        name_list = [{"id": i, "val": v} for i, v in enumerate(name_list)]
+        return render_template("draw_name.html", name_list=name_list)
 
-    return render_template("draw_name.html", name_list=name_list)
+    elif request.method == "POST":
+        user_id = request.form["name_selection"]
+        addresses_df = read_address_table().drop(int(user_id))
+        print(f"User {int(user_id)} excluded from selction")
 
+        target = random.choice(addresses_df.index.values)
+        print(f"{target} was randomly drawn")
+        print(addresses_df.to_string())
+        target_data = addresses_df.loc[target]
 
-@app.route("/draw", methods=["POST"])
-def select_name():
-
-    user_id = request.form["name_selection"]
-    addresses_df = read_address_table().drop(int(user_id))
-    print(f"User {int(user_id)} excluded from selction")
-
-    target = random.choice(addresses_df.index.values)
-    print(f"{target} was randomly drawn")
-    print(addresses_df.to_string())
-    target_data = addresses_df.loc[target]
-
-    return f"You have drawn {target_data['Name']}.<br>Posting Address is:<br>{target_data['Address']}"
+        return f"You have drawn {target_data['Name']}.<br>Posting Address is:<br>{target_data['Address']}"
 
 
 if __name__ == "__main__":
