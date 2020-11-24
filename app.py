@@ -2,8 +2,10 @@ from flask import Flask, request, render_template, url_for, redirect
 import pandas as pd
 import random
 from utils import read_address_table, add_to_table
+import os
 
-PORT = 1337
+
+PORT = os.getenv("PORT")
 
 ### start application definitions
 app = Flask(__name__)
@@ -39,14 +41,14 @@ def draw_name():
     name_list = read_address_table()["Name"].values.tolist()
     name_list = [{"id": i, "val": v} for i,v in enumerate(name_list)]
 
-    return render_template('names.html', name_list=name_list)
+    return render_template('draw_name.html', name_list=name_list)
 
 @app.route("/draw", methods=['POST'])
 def select_name():
 
     user_id = request.form["name_selection"]
     addresses_df = read_address_table().drop(int(user_id))
-    print(f"User {int(user_id)} excluded from seelction")
+    print(f"User {int(user_id)} excluded from selction")
 
     target = random.choice(addresses_df.index.values)
     print(f"{target} was randomly drawn")
