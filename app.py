@@ -16,18 +16,17 @@ def index():
 
     return render_template('home.html')
 
-@app.route('/submit')
+@app.route('/submit', methods=["GET"])
 def submit_address():
-    return render_template('address_form.html')
+    return render_template('submit_form.html')
+
 
 @app.route('/submit', methods=['POST'])
 def confirm_submission():
     name = request.form['name']
-    address = request.form['address']
-    add_to_table(name, address)
-    processed_text = f"Thank you {name.title()}!<br>\n your data has been submitted"
+    is_success = add_to_table(name, request.form['address'])
 
-    return processed_text
+    return render_template("submit_success.html", is_success=is_success, name=name.title())
 
 @app.route('/addresses')
 def show_tables():

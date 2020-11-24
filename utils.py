@@ -10,3 +10,5 @@ def add_to_table(name, address):
 
     with open("addresses.csv", "a") as f:
         f.write(f"{name}; {address}\n")
+
+    return "success"
