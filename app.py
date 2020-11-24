@@ -8,6 +8,7 @@ PORT = 1337
 ### start application definitions
 app = Flask(__name__)
 
+
 # define routes
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -16,9 +17,11 @@ def index():
 
     return render_template('home.html')
 
+
 @app.route('/submit')
 def submit_address():
     return render_template('address_form.html')
+
 
 @app.route('/submit', methods=['POST'])
 def confirm_submission():
@@ -28,6 +31,7 @@ def confirm_submission():
     processed_text = f"Thank you {name.title()}!<br>\n your data has been submitted"
 
     return processed_text
+
 
 @app.route('/addresses')
 def show_tables():
@@ -40,6 +44,7 @@ def draw_name():
     name_list = [{"id": i, "val": v} for i,v in enumerate(name_list)]
 
     return render_template('names.html', name_list=name_list)
+
 
 @app.route("/draw", methods=['POST'])
 def select_name():
@@ -54,6 +59,12 @@ def select_name():
     target_data = addresses_df.loc[target]
 
     return f"You have drawn {target_data['Name']}.<br>Posting Address is:<br>{target_data['Address']}"
+
+
+#Testing to check if it works
+@app.route('/test')
+def test():
+    return "Works!"
 
 
 if __name__ == '__main__':

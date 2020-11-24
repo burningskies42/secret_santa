@@ -1,0 +1,6 @@
+os:
+  - linux
+dist: ubuntu
+language: python
+script:
+  - python -m pytest -v
