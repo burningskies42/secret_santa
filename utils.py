@@ -1,7 +1,11 @@
 import pandas as pd
 
+from db import Connection
+
 
 def read_address_table():
+    with Connection() as conn:
+        conn
     return pd.read_csv("addresses.csv", sep=";")
 
 
