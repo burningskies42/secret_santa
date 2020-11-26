@@ -1,0 +1,8 @@
+SELECT
+    u.*
+    ,USER_ADDRESS
+FROM
+    USERS as u
+INNER JOIN
+    ADDRESSES as a
+    ON u.USER_ID = a.USER_ID
