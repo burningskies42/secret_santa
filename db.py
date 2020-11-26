@@ -35,7 +35,10 @@ class Connection:
         assert self.conn is not None, "Not connected"
         cur = self.conn.cursor()
         # TODO: add param support
-        cur.execute(query, params)
+        if params:
+            cur.execute(query, params)
+        else:
+            cur.execute(query)
         self.conn.commit()
         cur.close()
 
