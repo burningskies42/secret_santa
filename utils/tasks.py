@@ -1,7 +1,7 @@
 import pandas as pd
 from loguru import logger
 
-from db import Connection
+from .db import Connection
 
 
 def get_user_addresses():
