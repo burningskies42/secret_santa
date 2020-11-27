@@ -4,7 +4,7 @@ import random
 from flask import Flask, redirect, render_template, request, url_for
 from loguru import logger
 
-from utils import add_user, get_user_addresses
+from utils import add_user, assign_santa_to_target, get_free_santas, get_user_addresses
 
 # start application definitions
 PORT = os.getenv("PORT")
@@ -47,18 +47,14 @@ def show_tables():
 @app.route("/draw", methods=["GET", "POST"])
 def draw_name():
     if request.method == "GET":
-        name_list = get_user_addresses()["user_name"].values.tolist()
-        name_list = [{"id": i, "val": v} for i, v in enumerate(name_list)]
+        name_list = get_free_santas().values.tolist()
+        name_list = [{"id": uid, "val": uname} for uid, uname in name_list]
         return render_template("draw_name.html", name_list=name_list)
 
     elif request.method == "POST":
-        user_id = request.form["name_selection"]
-        addresses_df = get_user_addresses().drop(int(user_id))
-        logger.info(f"User {int(user_id)} excluded from selction")
-        target = random.choice(addresses_df.index.values)
-        logger.info(f"{target} was randomly drawn")
-        target_data = addresses_df.loc[target]
-        return f"You have drawn {target_data['user_name']}.<br>Posting Address is:<br>{target_data['user_address']}"
+        santa_id = request.form["name_selection"]
+        target_name, target_address = assign_santa_to_target(santa_id)
+        return f"You have drawn {target_name}.<br>Posting Address is:<br>{target_address}"
 
 
 if __name__ == "__main__":

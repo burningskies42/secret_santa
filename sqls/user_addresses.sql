@@ -1,5 +1,6 @@
 SELECT
-    u.*
+    u.USER_ID
+    ,USER_NAME
     ,USER_ADDRESS
 FROM
     USERS as u
