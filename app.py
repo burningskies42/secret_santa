@@ -4,7 +4,7 @@ import random
 from flask import Flask, redirect, render_template, request, url_for
 from loguru import logger
 
-from utils import add_user, assign_santa_to_target, get_all_users, get_free_santas, get_user_addresses
+from utils import add_user, assign_santa_to_target, get_all_users, get_free_santas, get_user_addresses, login_user
 
 # start application definitions
 PORT = os.getenv("PORT")
@@ -19,23 +19,46 @@ def index():
     if "go_to_submit" in request.form:
         return redirect(url_for("submit_address"))
 
+    if "go_to_login" in request.form:
+        return redirect(url_for("login"))
+
     if "go_to_draw" in request.form:
         return redirect(url_for("draw_name"))
 
-    logger.debug(request.form)
     return render_template("home.html", disable_draw=disable_draw)
+
+
+# Route for handling the login page logic
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    response = None
+    if request.method == "POST":
+        logger.debug(request.form)
+        response = login_user(request.form["user_login"], request.form["user_password"])
+        logger.debug(response)
+        if response != 0:
+            render_template("login.html", error=response)
+        else:
+            response = f"You are now logged in as {'response'}"
+            return render_template("home.html", message=response)
+    return render_template("login.html", error=response)
+
 
 @app.route("/submit", methods=["GET", "POST"])
 def submit_address():
+    error = None
+
     if request.method == "POST":
-        name = request.form["name"]
-        address = request.form["address"]
-        add_user(name, address)
-        processed_text = f"Thank you {name.title()}!<br>\n your data has been submitted"
-        return processed_text
+        error = add_user(request.form)
+        if error is not None:
+            return render_template("address_form.html", error=error)
+
+        processed_text = f"Thank you {request.form['name'].title()}!\n your data has been submitted"
+        return render_template("home.html", message=processed_text)
 
     elif request.method == "GET":
         return render_template("address_form.html")
+
 
 @app.route("/addresses", methods=["GET"])
 def show_tables():
@@ -54,10 +77,12 @@ def draw_name():
         target_name, target_address = assign_santa_to_target(santa_id)
         return f"You have drawn {target_name}.<br>Posting Address is:<br>{target_address}"
 
-#Testing to check if it works
-@app.route('/test')
+
+# Testing to check if it works
+@app.route("/test")
 def test():
     return "Works!"
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app.run(port=PORT, debug=True)
