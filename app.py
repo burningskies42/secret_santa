@@ -4,7 +4,7 @@ import random
 from flask import Flask, redirect, render_template, request, url_for
 from loguru import logger
 
-from utils import add_user, assign_santa_to_target, get_free_santas, get_user_addresses
+from utils import add_user, assign_santa_to_target, get_all_users, get_free_santas, get_user_addresses
 
 # start application definitions
 PORT = os.getenv("PORT")
@@ -47,7 +47,7 @@ def show_tables():
 @app.route("/draw", methods=["GET", "POST"])
 def draw_name():
     if request.method == "GET":
-        name_list = get_free_santas().values.tolist()
+        name_list = get_all_users().values.tolist()
         name_list = [{"id": uid, "val": uname} for uid, uname in name_list]
         return render_template("draw_name.html", name_list=name_list)
 

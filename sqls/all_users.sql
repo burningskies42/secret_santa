@@ -1,0 +1,5 @@
+SELECT
+    u.USER_ID
+    ,USER_NAME
+FROM
+    USERS as u

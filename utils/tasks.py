@@ -17,6 +17,12 @@ def get_user_addresses():
         return conn.query_dataframe(query)
 
 
+def get_all_users():
+    query = open("sqls/all_users.sql", "r").read()
+    with Connection("santa.db") as conn:
+        return conn.query_dataframe(query)
+
+
 def get_free_santas():
     query = open("sqls/free_santas.sql", "r").read()
     with Connection("santa.db") as conn:
