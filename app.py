@@ -25,7 +25,6 @@ def index():
     logger.debug(request.form)
     return render_template("home.html", disable_draw=disable_draw)
 
-
 @app.route("/submit", methods=["GET", "POST"])
 def submit_address():
     if request.method == "POST":
@@ -37,7 +36,6 @@ def submit_address():
 
     elif request.method == "GET":
         return render_template("address_form.html")
-
 
 @app.route("/addresses", methods=["GET"])
 def show_tables():
@@ -56,6 +54,10 @@ def draw_name():
         target_name, target_address = assign_santa_to_target(santa_id)
         return f"You have drawn {target_name}.<br>Posting Address is:<br>{target_address}"
 
+#Testing to check if it works
+@app.route('/test')
+def test():
+    return "Works!"
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(port=PORT, debug=True)
