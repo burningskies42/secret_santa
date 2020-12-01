@@ -59,11 +59,12 @@ def check_valid_user(login):
 def login_user(user_login, user_password):
     with Connection("santa.db") as conn:
         response = conn.query("SELECT USER_PASSWORD_HASH FROM USERS WHERE USER_LOGIN = ?", (user_login,))
-        logger.debug(f"response was: {response}")
         if len(response) == 0 or "USER_PASSWORD_HASH" not in response[0].keys():
-            return f"cannot find user {'user_login'}"
+            logger.info(f"cannot find user {user_login}")
+            return f"cannot find user {user_login}"
         elif not check_password_hash(response[0]["USER_PASSWORD_HASH"], user_password):
-            logger.info("")
-            return f"wrong password for user {'user_login'}"
+            logger.info(f"wrong password for user {user_login}")
+            return f"wrong password for user {user_login}"
         else:
-            0
+            logger.info(f"{user_login} successfully logged in")
+            return 0

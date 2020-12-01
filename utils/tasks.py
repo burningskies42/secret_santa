@@ -8,6 +8,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .db import Connection
 
 
+def enable_draw(enable):
+    if enable:
+        return ""
+    else:
+        return "disabled"
+
+
 def get_ts():
     return datetime.datetime.now()
 
@@ -30,17 +37,27 @@ def get_free_santas():
         return conn.query_dataframe(query)
 
 
-def get_free_targets():
+def get_free_targets(exclude_id):
     query = open("sqls/free_targets.sql", "r").read()
     with Connection("santa.db") as conn:
-        return conn.query_dataframe(query).set_index("user_id")
+        return conn.query_dataframe(query, (exclude_id, exclude_id,)).set_index("USER_ID")
 
 
-def assign_santa_to_target(santa_id):
-    santa_id = int(santa_id)
+def assign_santa_to_target(user_login):
+    santa_id = None
+    with Connection("santa.db") as conn:
+        query = f"SELECT USER_ID FROM USERS WHERE USER_LOGIN = '{user_login}'"
+        logger.debug(query)
+        santa_id = conn.query(query)[0]["USER_ID"]
+
+    logger.debug(f"user_id {santa_id} returned from DB")
 
     # supressing errors incase only one user remains
-    addresses_df = get_free_targets().drop(santa_id, errors="ignore")
+    try:
+        addresses_df = get_free_targets(santa_id)
+    except Exception as e:
+        return e
+
     logger.info(f"User {int(santa_id)} excluded from selection")
     target_id, target_name, target_address = addresses_df.reset_index().sample(1).iloc[0].values
     target_id = int(target_id)
