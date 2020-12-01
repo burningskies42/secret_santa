@@ -34,7 +34,6 @@ class Connection:
         """
         assert self.conn is not None, "Not connected"
         cur = self.conn.cursor()
-        # TODO: add param support
         if params:
             cur.execute(query, params)
         else:
@@ -42,7 +41,7 @@ class Connection:
         self.conn.commit()
         cur.close()
 
-    def query(self, query):
+    def query(self, query, params=None):
         """execute query and return the resulting data
 
         Args:
@@ -54,14 +53,16 @@ class Connection:
         self.conn.row_factory = dict_factory
         cur = self.conn.cursor()
 
-        # TODO: add param support
-        cur.execute(query)
+        if params:
+            cur.execute(query, params)
+        else:
+            cur.execute(query)
         data = cur.fetchall()
         cur.close()
         return data
 
-    def query_dataframe(self, query):
-        return pd.DataFrame(self.query(query))
+    def query_dataframe(self, query, params=None):
+        return pd.DataFrame(self.query(query, params=params))
 
     def __enter__(self):
         self.connect()

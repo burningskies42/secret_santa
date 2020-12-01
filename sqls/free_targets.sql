@@ -12,3 +12,12 @@ LEFT JOIN
     ON u.USER_ID = s.TARGET_ID
 WHERE
     s.TARGET_ID is NULL
+    and u.USER_ID != ?
+    and u.USER_ID not in (
+        select
+            santa_id
+        from
+            santas
+        where
+            target_id = ?
+);
