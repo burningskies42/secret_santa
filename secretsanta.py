@@ -3,6 +3,7 @@ import random
 
 from flask import Flask, redirect, render_template, request, url_for
 from loguru import logger
+from waitress import serve
 
 from utils import add_user, assign_santa_to_target, enable_draw, get_all_users, get_free_santas, get_user_addresses, login_user
 
@@ -90,4 +91,4 @@ def test():
 
 
 if __name__ == "__main__":
-    app.run(port=PORT, debug=True)
+    serve(app, host="0.0.0.0", port=PORT)
