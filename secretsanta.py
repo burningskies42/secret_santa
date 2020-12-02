@@ -25,7 +25,7 @@ def index():
 
     if "go_to_draw" in request.form:
         return redirect(url_for("draw_name"))
-    logger.debug(f"enable button {draw_phase} and {user_login}")
+    logger.debug(f"enable button {enable_draw(draw_phase)}")
     return render_template("home.html", disable_draw=enable_draw(draw_phase))
 
 
@@ -60,7 +60,7 @@ def submit_address():
             return render_template("address_form.html", error=error)
 
         processed_text = f"Thank you {request.form['name'].title()}!\n your data has been submitted"
-        return render_template("home.html", message=processed_text)
+        return render_template("home.html", message=processed_text,  disable_draw=enable_draw(draw_phase))
 
     elif request.method == "GET":
         return render_template("address_form.html")
