@@ -1,5 +1,6 @@
 import datetime
 import random
+from random import randrange
 
 import pandas as pd
 from loguru import logger
@@ -44,27 +45,37 @@ def get_free_targets(exclude_id):
 
 
 def assign_santa_to_target(user_login):
-    santa_id = None
     with Connection("santa.db") as conn:
-        query = f"SELECT USER_ID FROM USERS WHERE USER_LOGIN = '{user_login}'"
-        logger.debug(query)
-        santa_id = conn.query(query)[0]["USER_ID"]
+        query = open("sqls/get_target.sql", "r").read()
+        resp = conn.query(query, (user_login,))[0]
+        logger.debug(resp)
+        return resp["USER_NAME"], resp["USER_ADDRESS"]
 
-    logger.debug(f"user_id {santa_id} returned from DB")
 
-    # supressing errors incase only one user remains
-    try:
-        addresses_df = get_free_targets(santa_id)
-    except Exception as e:
-        return e
+def assign_all_santas():
+    query = "INSERT INTO SANTAS(SANTA_ID, TARGET_ID, CREATEDTS) VALUES(?, ?, current_timestamp)"
 
-    logger.info(f"User {int(santa_id)} excluded from selection")
-    target_id, target_name, target_address = addresses_df.reset_index().sample(1).iloc[0].values
-    target_id = int(target_id)
-    logger.info(f"{target_id} was randomly drawn")
-
-    query = open("sqls/assign_santa.sql", "r").read()
     with Connection("santa.db") as conn:
-        conn.execute(query, (santa_id, target_id, get_ts(),))
+        entries_in_santas = conn.query("SELECT COUNT(*) CNT FROM SANTAS")[0]["CNT"]
+        logger.debug(f"entries_in_santas: {entries_in_santas}")
+        entries_in_users = conn.query("SELECT COUNT(*) CNT FROM USERS")[0]["CNT"]
+        logger.debug(f"entries_in_users: {entries_in_users}")
 
-    return target_name, target_address
+        if entries_in_santas < entries_in_users:
+            users = [d["USER_ID"] for d in conn.query("SELECT USER_ID FROM USERS")]
+            santas = sattolo_cycle(users)
+            logger.debug([santas, users])
+            [conn.execute(query, (s, u,)) for s, u in zip(santas, users)]
+        else:
+            logger.debug("Already assigned santas")
+
+
+def sattolo_cycle(items):
+    """Sattolo's algorithm."""
+    new_items = items.copy()
+    i = len(new_items)
+    while i > 1:
+        i = i - 1
+        j = randrange(i)  # 0 <= j <= i-1
+        new_items[j], new_items[i] = new_items[i], new_items[j]
+    return new_items
