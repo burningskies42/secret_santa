@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 import random
 from random import randrange
 
@@ -16,8 +16,8 @@ def enable_draw(enable):
         return "disabled"
 
 
-def get_ts():
-    return datetime.datetime.now()
+def get_ts(offset=0):
+    return datetime.now() + timedelta(minutes=offset)
 
 
 def get_user_addresses():
@@ -47,9 +47,13 @@ def get_free_targets(exclude_id):
 def assign_santa_to_target(user_login):
     with Connection("santa.db") as conn:
         query = open("sqls/get_target.sql", "r").read()
-        resp = conn.query(query, (user_login,))[0]
+        resp = conn.query(query, (user_login,))
         logger.debug(resp)
-        return resp["USER_NAME"], resp["USER_ADDRESS"]
+
+        if len(resp) > 0:
+            return resp[0]["USER_NAME"], resp[0]["USER_ADDRESS"]
+
+        return None, None
 
 
 def assign_all_santas():
@@ -79,3 +83,21 @@ def sattolo_cycle(items):
         j = randrange(i)  # 0 <= j <= i-1
         new_items[j], new_items[i] = new_items[i], new_items[j]
     return new_items
+
+
+def reset_database():
+    sql_files = [
+        "drop_tables.sql",
+        "create_table_users.sql",
+        "create_table_santas.sql",
+        "create_table_addresses.sql"
+    ]
+
+    with Connection("santa.db") as conn:
+        for sql in sql_files:
+            with open(f"sqls/{sql}", "r") as f:
+                for query in f.read().split(";"):
+                    conn.query(query)
+                logger.debug(f"'{sql}' executed")
+
+    return True
