@@ -57,13 +57,13 @@ def submit_address():
     if request.method == "POST":
         error = add_user(request.form)
         if error is not None:
-            return render_template("address_form.html", error=error)
+            return render_template("submit_form.html", error=error)
 
         processed_text = f"Thank you {request.form['name'].title()}!\n your data has been submitted"
         return render_template("home.html", message=processed_text, disable_draw=enable_draw(draw_phase))
 
     elif request.method == "GET":
-        return render_template("address_form.html")
+        return render_template("submit_form.html")
 
 
 @app.route("/addresses", methods=["GET"])
