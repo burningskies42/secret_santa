@@ -1,0 +1,10 @@
+SELECT
+    u.USER_ID
+    ,USER_NAME
+FROM
+    USERS as u
+LEFT JOIN
+    SANTAS as s
+    ON u.USER_ID = s.SANTA_ID
+WHERE
+    s.SANTA_ID is NULL

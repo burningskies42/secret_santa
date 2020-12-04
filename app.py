@@ -2,8 +2,8 @@ import os
 import random
 
 from flask import Flask, redirect, render_template, request, url_for
-
 from utils import add_to_table, read_address_table
+
 
 # start application definitions
 PORT = os.getenv("PORT")

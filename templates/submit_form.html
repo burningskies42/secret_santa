@@ -3,9 +3,20 @@
 <h1>Please enter your data:</h1>
 <form method="POST">
     <label for="name">Name:</label><br>
-    <input type="text" id="fname" name="name"><br>
+    <input type="text" placeholder="Name" name="name"  value={{ request.form.name }}><br><br>
+
     <label for="address">Address:</label><br>
-    <input type="text" id="address" name="address"><br><br>
+    <input type="text" placeholder="Address" NAME="address" value={{ request.form.address }}><br><br>
+
+    <label for="login">User Name:</label><br>
+    <input type="text" placeholder="Username" name="login" value="{{ request.form.login }}"><br><br>
+
+    <label for="password">Password:</label><br>
+    <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}"><br><br>
+
     <input type="submit" value="Enter">
 </form>
+{% if error %}
+    <p class="error"><strong>Error:</strong> {{ error }}
+{% endif %}
 {% endblock %}
