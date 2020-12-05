@@ -2,21 +2,11 @@ import argparse
 import os
 import random
 
-from flask import Flask, redirect, render_template, request, url_for, make_response
+from flask import Flask, make_response, redirect, render_template, request, url_for
 from loguru import logger
 from waitress import serve
 
-from utils import (
-    add_user,
-    assign_all_santas,
-    assign_santa_to_target,
-    enable_draw,
-    get_all_users,
-    get_free_santas,
-    get_user_addresses,
-    login_user,
-    reset_database
-)
+from utils import add_user, assign_all_santas, assign_santa_to_target, enable_draw, get_user_addresses, login_user, reset_database
 
 # start application definitions
 user_login = None
@@ -26,8 +16,8 @@ app = Flask(__name__)
 # define routes
 @app.route("/", methods=["POST", "GET"])
 def index():
-    cookie_hash = request.cookies.get('user_cookie')
-    cookie_admin = request.cookies.get('admin_cookie')
+    cookie_hash = request.cookies.get("user_cookie")
+    cookie_admin = request.cookies.get("admin_cookie")
 
     if "go_to_submit" in request.form:
         return redirect(url_for("submit_address"))
@@ -42,9 +32,7 @@ def index():
         return redirect(url_for("draw_init"))
 
     return render_template(
-        "home.html",
-        disable_draw=enable_draw(cookie_hash is not None),
-        disable_draw_admin=enable_draw(cookie_hash is not None and str(cookie_admin) == "1")
+        "home.html", disable_draw=enable_draw(cookie_hash is not None), disable_draw_admin=enable_draw(cookie_hash is not None and str(cookie_admin) == "1")
     )
 
 
@@ -87,30 +75,26 @@ def submit_address():
 def show_tables():
     df = get_user_addresses()
     if df.empty:
-        return f"Draw net yet initialized!"
+        return "Draw not yet initialized!"
 
-    return render_template("get_addresses.html", tables=[df.to_html(classes='data')], titles=df.columns.values)
+    return render_template("get_addresses.html", tables=[df.to_html(classes="data")], titles=df.columns.values)
 
 
 @app.route("/draw")
 def draw_name():
-    user_login = request.cookies.get('user_login')
+    user_login = request.cookies.get("user_login")
     target_name, target_address = assign_santa_to_target(user_login)
 
     if target_name:
-        return render_template(
-            "address_drawn.html",
-            user=user_login,
-            target_name=target_name,
-            target_address=target_address
-        )
+        return render_template("address_drawn.html", user=user_login, target_name=target_name, target_address=target_address)
 
-    return f"Sorry, there was no assignment yet!"
+    return "Sorry, there was no assignment yet!"
 
 
 @app.route("/draw_init")
 def draw_init():
     assign_all_santas()
+    return render_template("home.html", message="Raffled names")
 
 
 # Testing to check if it works
@@ -123,7 +107,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-P", "--port", help="port to run on", default="5000")
     parser.add_argument("-D", "--debug", help="run in debug mode", action="store_true")
-    parser.add_argument("-R", "--resetdb", help="run in debug mode", action="store_true")
+    parser.add_argument("-R", "--resetdb", help="reset database", action="store_true")
     args = parser.parse_args()
 
     PORT = args.port or os.getenv("PORT") or "5000"
