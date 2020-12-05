@@ -58,11 +58,16 @@ class Connection:
         else:
             cur.execute(query)
         data = cur.fetchall()
+
         cur.close()
+
         return data
 
     def query_dataframe(self, query, params=None):
         return pd.DataFrame(self.query(query, params=params))
+
+    def commit(self):
+        self.conn.commit()
 
     def __enter__(self):
         self.connect()

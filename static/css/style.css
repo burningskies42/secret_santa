@@ -27,6 +27,17 @@ nav li a {
     text-decoration: none;
 }
 
+nav li.user-right {
+    color: blueviolet;
+    float: right;
+    text-decoration: none;
+}
+
+.user-icon {
+    width: 15px;
+    height: 15px;
+}
+
 .page-container {
     position: relative;
     min-height: 100vh;

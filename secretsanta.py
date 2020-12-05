@@ -2,14 +2,13 @@ import argparse
 import os
 import random
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, make_response, redirect, render_template, request, url_for
 from loguru import logger
 from waitress import serve
 
-from utils import add_user, assign_all_santas, assign_santa_to_target, enable_draw, get_all_users, get_free_santas, get_user_addresses, login_user
+from utils import add_user, assign_all_santas, assign_santa_to_target, enable_draw, get_user_addresses, login_user, reset_database
 
 # start application definitions
-draw_phase = "ENABLE_DRAW" in os.environ.keys()
 user_login = None
 app = Flask(__name__)
 
@@ -17,6 +16,9 @@ app = Flask(__name__)
 # define routes
 @app.route("/", methods=["POST", "GET"])
 def index():
+    cookie_hash = request.cookies.get("user_cookie")
+    cookie_admin = request.cookies.get("admin_cookie")
+
     if "go_to_submit" in request.form:
         return redirect(url_for("submit_address"))
 
@@ -25,8 +27,13 @@ def index():
 
     if "go_to_draw" in request.form:
         return redirect(url_for("draw_name"))
-    logger.debug(f"enable button {enable_draw(draw_phase)}")
-    return render_template("home.html", disable_draw=enable_draw(draw_phase))
+
+    if "go_to_draw_init" in request.form:
+        return redirect(url_for("draw_init"))
+
+    return render_template(
+        "home.html", disable_draw=enable_draw(cookie_hash is not None), disable_draw_admin=enable_draw(cookie_hash is not None and str(cookie_admin) == "1")
+    )
 
 
 # Route for handling the login page logic
@@ -36,16 +43,14 @@ def login():
     if request.method == "POST":
         logged_user = dict(request.form)["user_login"]
         logger.debug(f"{logged_user} logged in")
-        assign_all_santas()
-        response = login_user(request.form["user_login"], request.form["user_password"])
-        if response != 0:
-            render_template("login.html", error=response)
-        else:
-            user_login = request.form["user_login"]
-            response = f"You are now logged in as {user_login}"
-            target_name, target_address = assign_santa_to_target(user_login)
-            return f"You have drawn {target_name}.<br>Posting Address is:<br>{target_address}"
-            # return render_template("home.html", message=response)
+        response, set_cookies = login_user(request.form["user_login"], request.form["user_password"])
+        logger.debug(f"set_cookies: {set_cookies}")
+
+        resp = make_response(redirect(url_for("index")))
+        for key in set_cookies.keys():
+            resp.set_cookie(key, str(set_cookies[key]))
+
+        return resp
 
     return render_template("login.html", error=response)
 
@@ -60,7 +65,7 @@ def submit_address():
             return render_template("submit_form.html", error=error)
 
         processed_text = f"Thank you {request.form['name'].title()}!\n your data has been submitted"
-        return render_template("home.html", message=processed_text, disable_draw=enable_draw(draw_phase))
+        return render_template("home.html", message=processed_text)
 
     elif request.method == "GET":
         return render_template("submit_form.html")
@@ -68,20 +73,28 @@ def submit_address():
 
 @app.route("/addresses", methods=["GET"])
 def show_tables():
-    return get_user_addresses().to_html()
+    df = get_user_addresses()
+    if df.empty:
+        return "Draw not yet initialized!"
+
+    return render_template("get_addresses.html", tables=[df.to_html(classes="data")], titles=df.columns.values)
 
 
-@app.route("/draw",)
+@app.route("/draw")
 def draw_name():
-    # if request.method == "GET":
-    #     name_list = get_free_santas().values.tolist()
-    #     name_list = [{"id": uid, "val": uname} for uid, uname in name_list]
-    #     return render_template("draw_name.html", name_list=name_list)
-
-    # if request.method == "POST":
-    # santa_id = request.form["name_selection"]
+    user_login = request.cookies.get("user_login")
     target_name, target_address = assign_santa_to_target(user_login)
-    return f"You have drawn {target_name}.<br>Posting Address is:<br>{target_address}"
+
+    if target_name:
+        return render_template("address_drawn.html", user=user_login, target_name=target_name, target_address=target_address)
+
+    return "Sorry, there was no assignment yet!"
+
+
+@app.route("/draw_init")
+def draw_init():
+    assign_all_santas()
+    return render_template("home.html", message="Raffled names")
 
 
 # Testing to check if it works
@@ -94,9 +107,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-P", "--port", help="port to run on", default="5000")
     parser.add_argument("-D", "--debug", help="run in debug mode", action="store_true")
+    parser.add_argument("-R", "--resetdb", help="reset database", action="store_true")
     args = parser.parse_args()
 
     PORT = args.port or os.getenv("PORT") or "5000"
+
+    if args.resetdb:
+        logger.debug("Start DB reset")
+        reset_database()
 
     if args.debug:
         app.run(port=PORT, debug=True)
