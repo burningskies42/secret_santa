@@ -2,7 +2,7 @@ import argparse
 import os
 import random
 
-from flask import Flask, make_response, redirect, render_template, request, url_for
+from flask import Flask, make_response, redirect, render_template, request, session, url_for
 from loguru import logger
 from waitress import serve
 
@@ -32,7 +32,10 @@ def index():
         return redirect(url_for("draw_init"))
 
     return render_template(
-        "home.html", disable_draw=enable_draw(cookie_hash is not None), disable_draw_admin=enable_draw(cookie_hash is not None and str(cookie_admin) == "1")
+        "home.html",
+        disable_draw=enable_draw(cookie_hash is not None),
+        disable_draw_admin=enable_draw(cookie_hash is not None and str(cookie_admin) == "1"),
+        user=request.cookies.get("user_login") or "LOGIN",
     )
 
 
@@ -44,6 +47,9 @@ def login():
         logged_user = dict(request.form)["user_login"]
         logger.debug(f"{logged_user} logged in")
         response, set_cookies = login_user(request.form["user_login"], request.form["user_password"])
+        if "successfully logged in" not in response:
+            return render_template("login.html", error=response, user=request.cookies.get("user_login") or "LOGIN")
+
         logger.debug(f"set_cookies: {set_cookies}")
 
         resp = make_response(redirect(url_for("index")))
@@ -52,7 +58,7 @@ def login():
 
         return resp
 
-    return render_template("login.html", error=response)
+    return render_template("login.html", error=response, user=request.cookies.get("user_login") or "LOGIN")
 
 
 @app.route("/submit", methods=["GET", "POST"])
@@ -62,13 +68,13 @@ def submit_address():
     if request.method == "POST":
         error = add_user(request.form)
         if error is not None:
-            return render_template("submit_form.html", error=error)
+            return render_template("submit_form.html", error=error, user=request.cookies.get("user_login") or "LOGIN")
 
         processed_text = f"Thank you {request.form['name'].title()}!\n your data has been submitted"
-        return render_template("home.html", message=processed_text)
+        return render_template("home.html", message=processed_text, user=request.cookies.get("user_login") or "LOGIN")
 
     elif request.method == "GET":
-        return render_template("submit_form.html")
+        return render_template("submit_form.html", user=request.cookies.get("user_login") or "LOGIN")
 
 
 @app.route("/addresses", methods=["GET"])
@@ -77,16 +83,17 @@ def show_tables():
     if df.empty:
         return "Draw not yet initialized!"
 
-    return render_template("get_addresses.html", tables=[df.to_html(classes="data")], titles=df.columns.values)
+    return render_template(
+        "get_addresses.html", tables=[df.to_html(classes="data")], titles=df.columns.values, user=request.cookies.get("user_login") or "LOGIN"
+    )
 
 
 @app.route("/draw")
 def draw_name():
-    user_login = request.cookies.get("user_login")
-    target_name, target_address = assign_santa_to_target(user_login)
+    target_name, target_address = assign_santa_to_target(request.cookies.get("user_login"))
 
     if target_name:
-        return render_template("address_drawn.html", user=user_login, target_name=target_name, target_address=target_address)
+        return render_template("address_drawn.html", target_name=target_name, target_address=target_address, user=request.cookies.get("user_login") or "LOGIN")
 
     return "Sorry, there was no assignment yet!"
 
@@ -94,7 +101,7 @@ def draw_name():
 @app.route("/draw_init")
 def draw_init():
     assign_all_santas()
-    return render_template("home.html", message="Raffled names")
+    return render_template("home.html", message="Raffled names", user=request.cookies.get("user_login") or "LOGIN")
 
 
 # Testing to check if it works
