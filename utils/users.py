@@ -1,6 +1,6 @@
-import sys
-import string
 import random
+import string
+import sys
 
 from loguru import logger
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -38,10 +38,7 @@ def add_user(request_form):
         # add user to table
         add_user_query = open("sqls/add_user.sql", "r").read()
         is_admin = True if user_id == 1 else False
-        conn.execute(
-            add_user_query,
-            (user_id, name, login, generate_password_hash(password), get_ts(), is_admin,)
-        )
+        conn.execute(add_user_query, (user_id, name, login, generate_password_hash(password), get_ts(), is_admin,))
 
         # add address to table
         add_address_query = open("sqls/add_address.sql", "r").read()
@@ -67,10 +64,7 @@ def check_valid_user(login):
 
 def login_user(user_login, user_password):
     with Connection("santa.db") as conn:
-        response = conn.query(
-            "SELECT USER_LOGIN, USER_PASSWORD_HASH, IS_ADMIN FROM USERS WHERE USER_LOGIN = ?",
-            (user_login,)
-        )
+        response = conn.query("SELECT USER_LOGIN, USER_PASSWORD_HASH, IS_ADMIN FROM USERS WHERE USER_LOGIN = ?", (user_login,))
         cookies = {}
 
         if len(response) == 0 or "USER_PASSWORD_HASH" not in response[0].keys():
@@ -84,11 +78,8 @@ def login_user(user_login, user_password):
             logger.info(result)
 
             letters_and_digits = string.ascii_letters + string.digits
-            hashed = ''.join((random.choice(letters_and_digits) for i in range(64)))
-            conn.query(
-                "UPDATE users SET COOKIE = ?, COOKIE_VALID_TO = ? WHERE USER_LOGIN = ?",
-                (hashed, get_ts(offset=60), user_login,)
-            )
+            hashed = "".join((random.choice(letters_and_digits) for i in range(64)))
+            conn.query("UPDATE users SET COOKIE = ?, COOKIE_VALID_TO = ? WHERE USER_LOGIN = ?", (hashed, get_ts(offset=60), user_login,))
             conn.commit()
 
             cookies["user_cookie"] = hashed
