@@ -20,9 +20,11 @@ def add_user(request_form):
     if len(password) < 8:
         return "Password must have at least 8 characters"
 
+    recieved_data = set(request_form.keys())
+    
     # validate no empty field
-    missing_fields = necessary_fields - set([k for k, v in request_form.items() if len(v) > 0])
-    logger.debug(f"missing fields: {request_form}")
+    missing_fields = necessary_fields - recieved_data
+    logger.debug(f"missing fields: {missing_fields}")
     if len(missing_fields) > 0:
         return f"Field {str.upper(list(missing_fields)[0])} cannot be empty"
 
