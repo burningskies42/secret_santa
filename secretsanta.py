@@ -5,6 +5,8 @@ import random
 from flask import Flask, make_response, redirect, render_template, request, session, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_ipban import IpBan
+
 from loguru import logger
 from waitress import serve
 
@@ -14,7 +16,8 @@ from utils import add_user, assign_all_santas, assign_santa_to_target, enable_dr
 user_login = None
 app = Flask(__name__)
 limiter = Limiter(app, key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
-
+ip_ban = IpBan(ban_seconds=200)
+ip_ban.init_app(app)
 
 # define routes
 @app.route("/", methods=["POST", "GET"])
@@ -44,15 +47,19 @@ def index():
 
 # Route for handling the login page logic
 @app.route("/login", methods=["GET", "POST"])
-@limiter.limit("100/day;10/hour;3/minute")
+# @limiter.limit("100/day;10/hour;3/minute")
 def login():
     response = None
     if request.method == "POST":
         logged_user = dict(request.form)["user_login"]
-        logger.debug(f"{logged_user} logged in")
-        response, set_cookies = login_user(request.form["user_login"], request.form["user_password"])
+        logger.debug(f"requst with user-name {logged_user} from ip {request.remote_addr}")
+        response, set_cookies = login_user(request.form["user_login"], request.form["user_password"], request.remote_addr)
         if "successfully logged in" not in response:
-            return render_template("login.html", error=response, user=request.cookies.get("user_login") or "LOGIN")
+            if "too many attempts from this ip" in response:
+                ip_ban.add()
+                return 'Go away grinch, you are blacklisted'
+            else:
+                return render_template("login.html", error=response, user=request.cookies.get("user_login") or "LOGIN")
 
         logger.debug(f"set_cookies: {set_cookies}")
 

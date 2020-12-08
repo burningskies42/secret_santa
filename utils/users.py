@@ -9,6 +9,24 @@ from .db import Connection
 from .tasks import get_ts
 
 
+def login_attempts_for_ip(ip_address, minutes):
+    with Connection("santa.db") as conn:
+        last_minutes = f"-{minutes} minutes"
+        ret = conn.query(
+            "select count(*) CNT from logins where ip_address = ? and createdts >= datetime('now', ?)",
+            (ip_address, last_minutes, )
+        )[0]["CNT"]
+
+    return ret
+
+
+def log_login_attempt(ip_address, login_name):
+    with Connection("santa.db") as conn:
+        conn.execute(
+            "INSERT INTO logins(ip_address, login, createdts) VALUES (?, ?, ?)",
+            (ip_address, login_name, get_ts(),)
+        )
+
 def add_user(request_form):
     necessary_fields = {"name", "address", "login", "password"}
 
@@ -21,7 +39,7 @@ def add_user(request_form):
         return "Password must have at least 8 characters"
 
     recieved_data = set(request_form.keys())
-    
+
     # validate no empty field
     missing_fields = necessary_fields - recieved_data
     logger.debug(f"missing fields: {missing_fields}")
@@ -64,16 +82,22 @@ def check_valid_user(login):
             return None
 
 
-def login_user(user_login, user_password):
+def login_user(user_login, user_password, request_ip):
     with Connection("santa.db") as conn:
         response = conn.query("SELECT USER_LOGIN, USER_PASSWORD_HASH, IS_ADMIN FROM USERS WHERE USER_LOGIN = ?", (user_login,))
         cookies = {}
+        log_login_attempt(request_ip, user_login)
+        login_attempts = login_attempts_for_ip(request_ip, 5)
+        logger.debug(f"{login_attempts} login attempts from ip {request_ip} in last 5 minutes")
 
-        if len(response) == 0 or "USER_PASSWORD_HASH" not in response[0].keys():
-            result = f"cannot find user {user_login}"
+        if login_attempts >= 5:
+            result = "too many attempts from this ip: blacklisting"
+            logger.info(result)
+        elif len(response) == 0 or "USER_PASSWORD_HASH" not in response[0].keys():
+            result = "wrong combination or user and password"
             logger.info(result)
         elif not check_password_hash(response[0]["USER_PASSWORD_HASH"], user_password):
-            result = f"wrong password for user {user_login}"
+            result = "wrong combination or user and password"
             logger.info(result)
         else:
             result = f"{user_login} successfully logged in"

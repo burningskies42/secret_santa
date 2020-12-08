@@ -90,7 +90,8 @@ def reset_database():
         "drop_tables.sql",
         "create_table_users.sql",
         "create_table_santas.sql",
-        "create_table_addresses.sql"
+        "create_table_addresses.sql",
+        "create_table_logins.sql"
     ]
 
     with Connection("santa.db") as conn:
