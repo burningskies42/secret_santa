@@ -3,6 +3,8 @@ import os
 import random
 
 from flask import Flask, make_response, redirect, render_template, request, session, url_for
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from loguru import logger
 from waitress import serve
 
@@ -11,6 +13,7 @@ from utils import add_user, assign_all_santas, assign_santa_to_target, enable_dr
 # start application definitions
 user_login = None
 app = Flask(__name__)
+limiter = Limiter(app, key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
 
 
 # define routes
@@ -41,6 +44,7 @@ def index():
 
 # Route for handling the login page logic
 @app.route("/login", methods=["GET", "POST"])
+@limiter.limit("100/day;10/hour;3/minute")
 def login():
     response = None
     if request.method == "POST":
@@ -62,6 +66,7 @@ def login():
 
 
 @app.route("/submit", methods=["GET", "POST"])
+@limiter.limit("100/day;20/hour;10/minute")
 def submit_address():
     error = None
 
@@ -75,17 +80,6 @@ def submit_address():
 
     elif request.method == "GET":
         return render_template("submit_form.html", user=request.cookies.get("user_login") or "LOGIN")
-
-
-@app.route("/addresses", methods=["GET"])
-def show_tables():
-    df = get_user_addresses()
-    if df.empty:
-        return "Draw not yet initialized!"
-
-    return render_template(
-        "get_addresses.html", tables=[df.to_html(classes="data")], titles=df.columns.values, user=request.cookies.get("user_login") or "LOGIN"
-    )
 
 
 @app.route("/draw")
