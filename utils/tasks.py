@@ -1,13 +1,9 @@
 from datetime import datetime, timedelta
-import random
 from random import randrange
 
-import pandas as pd
 from loguru import logger
-from werkzeug.security import check_password_hash, generate_password_hash
 
 from .db import Connection
-
 
 def enable_draw(enable):
     if enable:
@@ -102,3 +98,4 @@ def reset_database():
                 logger.debug(f"'{sql}' executed")
 
     return True
+

@@ -1,8 +1,7 @@
 import argparse
 import os
-import random
 
-from flask import Flask, make_response, redirect, render_template, request, session, url_for
+from flask import Flask, make_response, redirect, render_template, request, url_for, flash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_ipban import IpBan
@@ -10,11 +9,12 @@ from flask_ipban import IpBan
 from loguru import logger
 from waitress import serve
 
-from utils import add_user, assign_all_santas, assign_santa_to_target, enable_draw, get_user_addresses, login_user, reset_database
+from utils import add_user, assign_all_santas, assign_santa_to_target, enable_draw, get_user_addresses, login_user, reset_database, requires_auth
 
 # start application definitions
 user_login = None
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 limiter = Limiter(app, key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
 ip_ban = IpBan(ban_seconds=200)
 ip_ban.init_app(app)
@@ -91,6 +91,7 @@ def submit_address():
 
 @app.route("/draw")
 def draw_name():
+
     target_name, target_address = assign_santa_to_target(request.cookies.get("user_login"))
 
     if target_name:
@@ -100,14 +101,15 @@ def draw_name():
 
 
 @app.route("/draw_init")
+@requires_auth
 def draw_init():
     assign_all_santas()
     return render_template("home.html", message="Raffled names", user=request.cookies.get("user_login") or "LOGIN")
 
-
 # Testing to check if it works
-@app.route("/test")
+@app.route("/test", methods=["GET", "POST"])
 def test():
+    logger.debug(f"auth: {request.authorization}")
     return "Works!"
 
 

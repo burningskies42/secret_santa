@@ -1,9 +1,11 @@
 import random
 import string
-import sys
 
 from loguru import logger
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from functools import wraps
+from flask import request, Response
 
 from .db import Connection
 from .tasks import get_ts
@@ -113,3 +115,28 @@ def login_user(user_login, user_password, request_ip):
             cookies["user_login"] = response[0]["USER_LOGIN"]
 
         return result, cookies
+
+def check_auth(username, password, remote_addr):
+    """This function is called to check if a username /
+    password combination is valid.
+    """
+    msg, cookies = login_user(username, password, remote_addr)
+    logger.debug(cookies)
+    check = ("successfully logged in" in msg ) and (cookies["admin_cookie"] == 1)
+    return check
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password, request.remote_addr):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
