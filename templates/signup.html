@@ -1,7 +1,16 @@
 {% extends "main.html" %}
 {% block content %}
 <h1>Please enter your data:</h1>
-<form method="POST">
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="notification is-danger">
+        {{ messages[0] }}. Go to <a href="{{ url_for('auth.login') }}">login page</a>.
+    </div>
+    <br>
+    <br>
+{% endif %}
+{% endwith %}
+<form method="POST" action="/signup">
     <label for="name">Name:</label><br>
     <input type="text" placeholder="Name" name="name"  value={{ request.form.name }}><br><br>
 

@@ -86,7 +86,7 @@ def check_valid_user(login):
 
 def login_user(user_login, user_password, request_ip):
     with Connection("santa.db") as conn:
-        response = conn.query("SELECT USER_LOGIN, USER_PASSWORD_HASH, IS_ADMIN FROM USERS WHERE USER_LOGIN = ?", (user_login,))
+        response = conn.query("SELECT USER_ID, USER_LOGIN, USER_PASSWORD_HASH, IS_ADMIN FROM USERS WHERE USER_LOGIN = ?", (user_login,))
         cookies = {}
         log_login_attempt(request_ip, user_login)
         login_attempts = login_attempts_for_ip(request_ip, 5)
@@ -102,7 +102,7 @@ def login_user(user_login, user_password, request_ip):
             result = "wrong combination or user and password"
             logger.info(result)
         else:
-            result = f"{user_login} successfully logged in"
+            result = response[0]
             logger.info(result)
 
             letters_and_digits = string.ascii_letters + string.digits

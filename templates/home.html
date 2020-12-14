@@ -2,11 +2,12 @@
 {% block content %}
 
 <h1>Welcome to BestSecret Santa!</h1>
-<form method="post" action="/">
-    <input type="submit" name="go_to_submit" value="Create Account"/>
-    <input type="submit" name="go_to_draw" value="Draw"  {{ disable_draw }}/>
-    <!-- <input type="submit" name="go_to_draw_init" value="Initialize Draw" {{ disable_draw_admin }}/> -->
-</form>
+<a href="/signup">
+    <button>Create Account</button>
+</a>
+<a href="/draw">
+    <button>Draw</button>
+</a>
 {% if message %}
     <p class="error"><strong></strong> {{ message }}
 {% endif %}

@@ -2,14 +2,13 @@
 <html>
     <div class="snow"></div>
     <header>
-        <title c>Hello Santa!</title>
+        <title>Hello Santa!</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     </header>
     <body class="page-container">
         <nav>
             <ul class="navigation">
                 <li><a href="/">Home</a></li>
-                <!-- <li><a href="/addresses">User Addresses</a></li> -->
                 <li><a href="https://github.com/burningskies42">Contact me</a></li>
                 <li class="user-right"><a href="/login">{{ user }}</a></li>
             </ul>
