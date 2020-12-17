@@ -5,21 +5,27 @@ from flask import Flask
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
-# from flask_ipban import IpBan
+from flask_sqlalchemy import SQLAlchemy
 
-from .auth import auth as auth_blueprint
-from .secretsanta import main as main_blueprint
-from .utils import reset_database
+# init SQLAlchemy
+db = SQLAlchemy()
 
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.urandom(24)
 
-    if os.environ.get("RESET_DB") == "1":
-        reset_database()
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///santa.sqlite"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    db.init_app(app)
 
+    if os.environ.get("RESET_DB") == "1":
+        with app.app_context():
+            db.create_all()
+
+    from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
+    from .secretsanta import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
     login_manager = LoginManager()

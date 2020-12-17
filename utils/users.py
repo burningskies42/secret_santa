@@ -84,7 +84,7 @@ def check_valid_user(login):
             return None
 
 
-def login_user(user_login, user_password, request_ip):
+def log_in_user(user_login, user_password, request_ip):
     with Connection("santa.db") as conn:
         response = conn.query("SELECT USER_ID, USER_LOGIN, USER_PASSWORD_HASH, IS_ADMIN FROM USERS WHERE USER_LOGIN = ?", (user_login,))
         cookies = {}

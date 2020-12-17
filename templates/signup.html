@@ -12,13 +12,13 @@
 {% endwith %}
 <form method="POST" action="/signup">
     <label for="name">Name:</label><br>
-    <input type="text" placeholder="Name" name="name"  value={{ request.form.name }}><br><br>
+    <input type="text" placeholder="Name" name="name"  value="{{ request.form.name }}"><br><br>
 
     <label for="address">Address:</label><br>
-    <input type="text" placeholder="Address" NAME="address" value={{ request.form.address }}><br><br>
+    <input type="text" placeholder="Address" NAME="address" value="{{ request.form.address }}"><br><br>
 
-    <label for="login">User Name:</label><br>
-    <input type="text" placeholder="Username" name="login" value="{{ request.form.login }}"><br><br>
+    <label for="login">Email:</label><br>
+    <input type="text" placeholder="Email" name="email" value="{{ request.form.email }}"><br><br>
 
     <label for="password">Password:</label><br>
     <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}"><br><br>

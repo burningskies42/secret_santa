@@ -8,11 +8,12 @@
         <div class="notification is-danger">
             {{ messages[0] }}
         </div>
+        <br>
     {% endif %}
     {% endwith %}
     <form action="" method="POST">
-        <input type="text" placeholder="Username" name="user_login" value="{{ request.form.user_login }}">
-        <input type="password" placeholder="Password" name="user_password" value="{{ request.form.user_password }}">
+        <input type="text" placeholder="Email" name="email" value="{{ request.form.user_login }}">
+        <input type="password" placeholder="Password" name="password" value="{{ request.form.user_password }}">
         <br>
         <br>
         <div class="field">
