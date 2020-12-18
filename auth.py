@@ -1,36 +1,18 @@
 from flask import Blueprint, make_response, redirect, render_template, request, url_for, flash
-from flask_login import login_user
+from flask_login import login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # from .utils.db import Connection
-from utils import add_user, log_in_user
 from .models import Users
 from . import db
 
 
-auth = Blueprint('auth', __name__)
+auth = Blueprint("auth", __name__)
 
-# Route for handling the login page logic
-@auth.route("/login")
-def login():
-    return render_template("login.html")
-
-@auth.route('/login', methods=['POST'])
-def login_post():
-    # remember = True if request.form.get('remember') else False
-    user = Users.query.filter_by(email=request.form.get('email')).first()
-    print(f"User: {user}")
-    if not user or not check_password_hash(user.password, request.form.get('password')):
-        flash('Please check your login details and try again.')
-        return redirect(url_for('auth.login'))
-
-    return redirect(url_for('main.index'))
-
-
+# Routes for handling the signup/login/logout pages
 @auth.route('/signup')
 def signup():
     return render_template("signup.html")
-
 
 @auth.route('/signup', methods=['POST'])
 def signup_post():
@@ -52,6 +34,24 @@ def signup_post():
     return redirect(url_for('auth.login'))
 
 
+@auth.route("/login")
+def login():
+    return render_template("login.html")
+
+@auth.route('/login', methods=['POST'])
+def login_post():
+    remember = True if request.form.get('remember') else False
+    user = Users.query.filter_by(email=request.form.get('email')).first()
+    if not user or not check_password_hash(user.password, request.form.get('password')):
+        flash('Please check your login details and try again.')
+        return redirect(url_for('auth.login'))
+
+    login_user(user, remember=remember)
+    return redirect(url_for('users.profile', user_id=user.id))
+
+
 @auth.route('/logout')
+@login_required
 def logout():
-    return 'Logout'
+    logout_user()
+    return redirect(url_for('main.index'))

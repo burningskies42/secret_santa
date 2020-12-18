@@ -18,30 +18,6 @@ main = Blueprint('main', __name__)
 def index():
     return render_template("home.html")
 
-@main.route("/draw")
-def draw_name():
-    target_name, target_address = assign_santa_to_target(request.cookies.get("user_login"))
-
-    if target_name:
-        return render_template(
-            "address_drawn.html",
-            target_name=target_name,
-            target_address=target_address,
-            user=request.cookies.get("user_login") or "LOGIN"
-        )
-
-    return "Sorry, there was no assignment yet!"
-
-
-@main.route("/draw_init")
-def draw_init():
-    assign_all_santas()
-    return render_template(
-        "home.html",
-        message="Raffled names",
-        user=request.cookies.get("user_login") or "LOGIN"
-    )
-
 
 # Testing to check if it works
 @main.route("/test", methods=["GET", "POST"])
