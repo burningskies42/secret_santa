@@ -12,18 +12,18 @@ groups = Blueprint("groups", __name__)
 
 @groups.route("/groups/create/user/<int:user_id>")
 @login_required
-def create_group(user_id):
+def create(user_id):
     return "Sorry, the page was not implemneted yet!"
 
 @groups.route("/groups/create/user/<int:user_id>", methods=["POST"])
 @login_required
-def create_group(user_id):
+def create_post(user_id):
     return "Sorry, the page was not implemneted yet!"
 
 
 @groups.route("/groups/<int:group_id>/join/user/<int:user_id>")
 @login_required
-def join_group(user_id):
+def join(user_id):
     return "Sorry, the page was not implemneted yet!"
 
 
