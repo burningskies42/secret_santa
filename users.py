@@ -15,7 +15,7 @@ def profile(user_id):
         logger.warning("wrong user.id and current_user.id")
         return render_template("home.html")
 
-    return render_template("user.html", name=current_user.name)
+    return render_template("user.html")
 
 
 @users.route("/users/<int:user_id>/edit")
