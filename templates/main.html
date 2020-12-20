@@ -3,16 +3,52 @@
     <div class="snow"></div>
     <header>
         <title>Hello Santa!</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"/>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     </header>
-    <body class="page-container">
-        <nav>
-            <ul class="navigation">
-                <li><a href="/">Home</a></li>
-                <li><a href="https://github.com/burningskies42">Contact me</a></li>
-                <li class="user-right"><a href="/login">{{ namem }}</a></li>
-            </ul>
+    <body>
+        <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
+            <div class="container">
+                <div id="navbarMenuHeroA" class="navbar-menu">
+                    <a href="{{ url_for('main.index') }}" class="navbar-item">
+                        Home
+                    </a>
+                    <div class="navbar-item">
+                        <a href="https://github.com/burningskies42" class="navbar-item"> Contact me</a>
+                    </div>
+
+                    <div class="navbar-item navbar-end dropdown is-hoverable">
+                        <div class="dropdown-trigger">
+                            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                            <span>
+                                {% if current_user.is_authenticated %}
+                                {{current_user.name.capitalize()}}
+                                {% else %}
+                                Login/Signup
+                                {% endif %}
+                            </span>
+                            <span class="icon is-small">
+                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                            </button>
+                        </div>
+                        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                            <div class="dropdown-content">
+                                <a href="{{ url_for('auth.signup') }}" class="dropdown-item">
+                                    Sign Up
+                                </a>
+                                <hr class="dropdown-divider">
+                                <a href="{{ url_for('auth.login') }}" class="dropdown-item">
+                                    Login
+                                </a>
+                                <a href="{{ url_for('auth.logout') }}" class="dropdown-item">
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </nav>
         <div class="content-wrap">
             <div class="container">
@@ -20,7 +56,10 @@
             </div>
         </div>
         <footer class="footer">
-            <p>&copy; 2020 BurningSkies_1337 GmbH</p>
+            <div class="content has-text-centered">
+                <p>&copy; 2020 BurningSkies_1337 GmbH</p>
+            </div>
         </footer>
+        <script src="{{ url_for('static', filename='javascript/BulmaJS-0.12.0/dist/bulma.js') }}"></script>
     </body>
 </html>

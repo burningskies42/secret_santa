@@ -1,6 +1,5 @@
 {% extends "main.html" %}
 {% block content %}
-<h1>Please enter your data:</h1>
 {% with messages = get_flashed_messages() %}
 {% if messages %}
     <div class="notification is-danger">
@@ -10,21 +9,20 @@
     <br>
 {% endif %}
 {% endwith %}
-<form method="POST" action="/signup">
-    <label for="name">Name:</label><br>
-    <input type="text" placeholder="Name" name="name"  value="{{ request.form.name }}"><br><br>
-
-    <label for="address">Address:</label><br>
-    <input type="text" placeholder="Address" NAME="address" value="{{ request.form.address }}"><br><br>
-
-    <label for="login">Email:</label><br>
-    <input type="text" placeholder="Email" name="email" value="{{ request.form.email }}"><br><br>
-
-    <label for="password">Password:</label><br>
-    <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}"><br><br>
-
-    <input type="submit" value="Enter">
-</form>
+<div class="column is-5 is-offset-3">
+    <h3 class="title">Sign Up</h3>
+        <form method="POST" action="/signup">
+            <input type="text" placeholder="Name" name="name"  value="{{ request.form.name }}"><br><br>
+        
+            <input type="text" placeholder="Address" NAME="address" value="{{ request.form.address }}"><br><br>
+        
+            <input type="text" placeholder="Email" name="email" value="{{ request.form.email }}"><br><br>
+        
+            <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}"><br><br>
+        
+            <input type="submit" value="Enter">
+        </form>
+</div>
 {% if error %}
     <p class="error"><strong>Error:</strong> {{ error }}
 {% endif %}
