@@ -12,18 +12,20 @@
         <br>
     {% endif %}
     {% endwith %}
-    <form action="" method="POST">
-        <input type="text" placeholder="Email" name="email" value="{{ request.form.user_login }}">
-        <input type="password" placeholder="Password" name="password" value="{{ request.form.user_password }}">
-        <br>
-        <br>
-        <div class="field">
-            <label class="checkbox">
-                <input type="checkbox">Remember me
-            </label>
-        </div>
-        <br>
-        <button class="button">Login</button>
-    </form>
+    <div class="column is-5 is-offset-3">
+        <h3 class="title">Sign Up</h3>
+            <form action="" method="POST">
+                <input type="text" placeholder="Email" name="email" value="{{ request.form.user_login }}"><br><br>
+                <input type="password" placeholder="Password" name="password" value="{{ request.form.user_password }}">
+                <br>
+                <br>
+                <button class="button" style="float:left; margin:10px" >Login</button>
+                <div class="field">
+                    <label class="checkbox" style="float:left; margin:10px" >
+                        <input type="checkbox"> Remember me
+                    </label>
+                </div>
+            </form>
+    </div>
 </div>
 {% endblock %}

@@ -6,21 +6,43 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     </header>
-    <body class="page-container">
-        <nav>
-            <ul class="navigation">
-                <li><a href="/">Home</a></li>
-                <li><a href="https://github.com/burningskies42">Contact me</a></li>
-                <li class="user-right"><a href="/login">{{ namem }}</a></li>
-            </ul>
-        </nav>
-        <div class="content-wrap">
-            <div class="container">
-                {% block content %}{% endblock %}
+    <body>
+        <!-- <section class="hero is-primary is-fullheight"></section> -->
+            <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
+                <div class="container">
+                    <div id="navbarMenuHeroA" class="navbar-menu">
+                        <a href="{{ url_for('main.index') }}" class="navbar-item">
+                            Home
+                        </a>
+                        <a href="{{ url_for('auth.login') }}" class="navbar-item">
+                            Login
+                        </a>
+                        <a href="{{ url_for('auth.signup') }}" class="navbar-item">
+                            Sign Up
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="navbar-item">
+                            Logout
+                        </a>
+                    </div>
+                    <div class="navbar-end">
+                        <a href="https://github.com/burningskies42" class="navbar-item"> Contact me</a>
+                    </div>
+    
+                </div>
+                <!-- <ul class="navigation">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="https://github.com/burningskies42">Contact me</a></li>
+                    <li class="user-right"><a href="/login">{{ namem }}</a></li>
+                </ul> -->
+            </nav>
+            <div class="content-wrap">
+                <div class="container">
+                    {% block content %}{% endblock %}
+                </div>
             </div>
-        </div>
-        <footer class="footer">
-            <p>&copy; 2020 BurningSkies_1337 GmbH</p>
-        </footer>
+            <footer class="footer">
+                <p>&copy; 2020 BurningSkies_1337 GmbH</p>
+            </footer>
+        <!-- </section> -->
     </body>
 </html>
