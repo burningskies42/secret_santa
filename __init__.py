@@ -14,8 +14,8 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.urandom(24)
-
+    # app.config["SECRET_KEY"] = os.environ
+    app.secret_key = os.getenv("SECRET_KEY")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///santa.sqlite"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)

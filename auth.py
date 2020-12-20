@@ -3,8 +3,11 @@ from flask_login import login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # from .utils.db import Connection
+from .forms import UserForm
 from .models import Users
 from . import db
+
+from loguru import logger
 
 
 auth = Blueprint("auth", __name__)
@@ -12,26 +15,33 @@ auth = Blueprint("auth", __name__)
 # Routes for handling the signup/login/logout pages
 @auth.route('/signup')
 def signup():
-    return render_template("signup.html")
+    user_form = UserForm()
+    return render_template("signup.html", form=user_form)
 
 @auth.route('/signup', methods=['POST'])
 def signup_post():
+    logger.debug(request.form)
     user = Users.query.filter_by(email=request.form.get("email")).first()
     if user:
         flash('Email address already exists')
         return redirect(url_for('auth.signup'))
 
-    new_user = Users(
-        email=request.form.get("email"),
-        name=request.form.get("name"),
-        password=generate_password_hash(request.form.get("password"), method='sha256')
-    )
+    user_form = UserForm(request.form)
+    # from IPython import embed; embed()
+    if user_form.validate():
+        new_user = Users(
+            email=request.form.get("email"),
+            name=request.form.get("name"),
+            password=generate_password_hash(request.form.get("password"), method='sha256')
+        )
 
-    # add the new user to the database
-    db.session.add(new_user)
-    db.session.commit()
+        # add the new user to the database
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('auth.login'))
 
-    return redirect(url_for('auth.login'))
+    else:
+        return render_template("signup.html", form=user_form)
 
 
 @auth.route("/login")
