@@ -2,12 +2,11 @@ from loguru import logger
 from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
 
-from .forms import UserForm
+from .forms import UserForm, DeleteForm
 from . import db
 
 
 users = Blueprint("users", __name__)
-
 
 @users.route('/new')
 def signup():
@@ -23,7 +22,6 @@ def signup_post():
         return redirect(url_for('users.signup'))
 
     user_form = UserForm(request.form)
-    # from IPython import embed; embed()
     if user_form.validate():
         new_user = Users(
             email=request.form.get("email"),
@@ -50,7 +48,20 @@ def profile(user_id):
     return render_template("user.html")
 
 
-@users.route("/users/<int:user_id>/edit")
+@users.route("/users/<int:user_id>/edit", methods=['PATCH'])
 @login_required
-def edit(user_id):
+def user_edit(user_id):
     return "Sorry, the page was not implemneted yet!"
+
+
+@users.route("/users/<int:user_id>/delete")
+@login_required
+def user_delete(user_id, methods=['DELETE']):
+    found_user = Users.query.get(id)
+    delete_form = DeleteForm(request.form)
+    if delete_form.validate():
+        # now that CSRF has been validated, user can be deleted
+        db.session.delete(found_user)
+        db.session.commit()
+        flash('User Deleted!')
+        return render_template()  
