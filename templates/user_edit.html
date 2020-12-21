@@ -2,7 +2,7 @@
 {% block content %}
 {% with messages = get_flashed_messages() %}
 <div class="container">
-  <h2 class="title">Register</h2>
+  <h2 class="title">Update User</h2>
   <br>
   {% if messages %}
       <div class="notification is-danger">
@@ -12,9 +12,9 @@
   {% endif %}
   {% endwith %}
   <div class="column is-4 is-offset-0">
-    <form method="POST" action="{{ url_for('users.signup') }}">
+    <form method="POST" action="/edit">
       {{ form.hidden_tag() }}
-      {% for field in form if field.widget.input_type != "hidden" %}
+      {% for field in form if field.widget.input_type != "hidden" and field.label != "password" %}
       <p>
           {{ field.label }} <br>
           {{ field }}
