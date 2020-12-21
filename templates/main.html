@@ -24,7 +24,7 @@
                                 {% if current_user.is_authenticated %}
                                 {{current_user.name.capitalize()}}
                                 {% else %}
-                                Login/Signup
+                                Login / Register
                                 {% endif %}
                             </span>
                             <span class="icon is-small">
@@ -34,8 +34,8 @@
                         </div>
                         <div class="dropdown-menu" id="dropdown-menu" role="menu">
                             <div class="dropdown-content">
-                                <a href="{{ url_for('auth.signup') }}" class="dropdown-item">
-                                    Sign Up
+                                <a href="{{ url_for('users.signup') }}" class="dropdown-item">
+                                    Register
                                 </a>
                                 <hr class="dropdown-divider">
                                 <a href="{{ url_for('auth.login') }}" class="dropdown-item">

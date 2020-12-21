@@ -6,33 +6,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from .models import Users
 from . import db
 
+from loguru import logger
+
 
 auth = Blueprint("auth", __name__)
 
 # Routes for handling the signup/login/logout pages
-@auth.route('/signup')
-def signup():
-    return render_template("signup.html")
-
-@auth.route('/signup', methods=['POST'])
-def signup_post():
-    user = Users.query.filter_by(email=request.form.get("email")).first()
-    if user:
-        flash('Email address already exists')
-        return redirect(url_for('auth.signup'))
-
-    new_user = Users(
-        email=request.form.get("email"),
-        name=request.form.get("name"),
-        password=generate_password_hash(request.form.get("password"), method='sha256')
-    )
-
-    # add the new user to the database
-    db.session.add(new_user)
-    db.session.commit()
-
-    return redirect(url_for('auth.login'))
-
 
 @auth.route("/login")
 def login():
