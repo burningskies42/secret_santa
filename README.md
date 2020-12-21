@@ -11,6 +11,9 @@ The best way to run the app is to export the FLASK_APP environment where the __i
 
 > FLASK_APP=~/Documents/secret_santa python -m flask run --port=1337
 
-Argparse was removed due to errors. In case you want to use Flask debug mode set the FLASK_ENV to development. In case you want to reset the database set the RESET_DB env to `1` and run:
+In case you want to use Flask debug mode set the FLASK_ENV to development. In case you want to reset the database set the RESET_DB env to `1` and run:
 
 > FLASK_APP=~/Documents/secret_santa FLASK_ENV=development RESET_DB=1 python -m flask run
+
+Before launching the you must have a CSRF key saved as an environment variable (or pass it together in the same line). The variable has to be saved in SECRET_KEY. Easiest way to do this if you are using a virtual environment is so add such a command to the venv start-up script:
+> echo "export SECRET_KEY=super_secret_key" >> venv/bin/activate
