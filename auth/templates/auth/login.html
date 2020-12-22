@@ -1,0 +1,17 @@
+{% extends "main.html" %}
+{% block content %}
+<div>
+    <form action="" method="POST">
+        <input type="text" placeholder="Email" name="email" value="{{ request.form.user_login }}"><br><br>
+        <input type="password" placeholder="Password" name="password" value="{{ request.form.user_password }}">
+        <br>
+        <br>
+        <button class="button" style="float:left; margin:10px" >Login</button>
+        <div class="field">
+            <label class="checkbox" style="float:left; margin:10px" >
+                <input type="checkbox"> Remember me
+            </label>
+        </div>
+    </form>
+</div>
+{% endblock %}
