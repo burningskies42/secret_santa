@@ -57,15 +57,19 @@ def profile():
 @users.route("/edit")
 @login_required
 def edit():
-    return render_template('users/user_edit.html', title="Update User")
+    logger.warning(f"id: {current_user.id}")
+    user = Users.query.get(current_user.id)
+    #TODO: create EditForm() and adapt it here
+    form = UserForm(request.form)
+    return render_template('users/user_edit.html', title="Update User", form=form)
 
 
 @users.route("/edit", methods=['PATCH'])
 @login_required
 def edit_patch():
-    user = Users.query.get(id)
-    # notice for editing/creating we use a different form!
-    form = AuthorForm(request.form)
+    user = Users.query.get(current_user.id)
+    #TODO: create EditForm() and adapt it here
+    form = UserForm(request.form)
     if form.validate():
         # normal edit logic
         user.name = form.data.name
@@ -84,7 +88,7 @@ def edit_patch():
 @users.route("/delete", methods=['DELETE'])
 @login_required
 def delete():
-    found_user = Users.query.get(id)
+    found_user = Users.query.get(current_user.id)
     delete_form = DeleteForm(request.form)
     if delete_form.validate():
         # now that CSRF has been validated, user can be deleted
