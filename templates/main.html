@@ -10,12 +10,18 @@
         <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
             <div class="container">
                 <div id="navbarMenuHeroA" class="navbar-menu">
-                    <a href="{{ url_for('main.index') }}" class="navbar-item">
+                    <a href="   {{ url_for('main.index') }}" class=" navbar-item">
+                        <span class="icon">
+                            <i class="fas fa-home"></i>
+                        </span>
                         Home
                     </a>
-                    <div class="navbar-item">
-                        <a href="https://github.com/burningskies42" class="navbar-item"> Contact me</a>
-                    </div>
+                    <a href="{{ url_for('groups.index') }}" class="navbar-item">
+                        Groups
+                    </a>
+                    <a href="https://github.com/burningskies42" class="navbar-item">
+                        Contact me
+                    </a>
 
                     <div class="navbar-item navbar-end dropdown is-hoverable">
                         {% if current_user.is_authenticated %}
@@ -44,6 +50,7 @@
                         {% else %}
                         <div class="dropdown-trigger">
                             <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                            <i class="fas fa-user"></i>
                             <span>Login / Register</span>
                             <span class="icon is-small">
                                 <i class="fas fa-angle-down" aria-hidden="true"></i>

@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+{% block content %}
+<h2 class="title">{{group.name}}</h2>
+<p>Some description goes here!</p>
+<br>
+<div class="content">
+    <button class="button" {% if not current_user.is_authenticated %}disabled{% endif %}>
+        <a href="{{ url_for('groups.join', group_id=group.id) }}">Join</a>
+    </button>
+</div>
+{% if users %}
+<h2 class="title is-4">Members:</h2>
+{% for user, is_owner in users %}
+<ul class="box">
+    <li>
+        <i class="fas fa-user"></i><strong>{{user.name}}</strong>
+        {% if is_owner %}&nbsp;(admin){% endif%}
+    </li>
+</ul>
+{% endfor %}
+{% endif %}
+{% endblock %}
