@@ -73,8 +73,6 @@ def delete(group_id):
     return redirect(url_for('groups.index'))
 
 
-
-
 @groups.route("/<int:group_id>/profile")
 def profile(group_id):
     found_group = Groups.query.get(group_id)
