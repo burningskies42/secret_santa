@@ -3,7 +3,6 @@ from . import db
 
 
 class User(db.Model, UserMixin):
-    # __bind_key__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(1000))
@@ -21,7 +20,6 @@ class User(db.Model, UserMixin):
 
 
 class Group(db.Model):
-    # __bind_key__ = 'groups'
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(100), unique=True)
@@ -32,7 +30,7 @@ class Group(db.Model):
 
 
 class Address(db.Model):
-    # __bind_key__ = 'addresses'
+    #TODO:is it necessary add __bind_key__ = 'addresses'
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
