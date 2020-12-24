@@ -1,4 +1,4 @@
-nav {
+/* nav {
     width: 100%;
     float: left;
     height: 70px;
@@ -57,19 +57,20 @@ nav li.user-right {
 .container {
     width: 800px;
     clear: both;
-}
+} */
 
 .footer {
+    background-color:#fafafa;
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 0.5rem;
+    height: 80px;
     color: rgb(0, 0, 0);
 }
 
-.title{ 
+.title{
     color: rgb(255, 255, 255)
-} 
+}
 
 
 body {
@@ -103,6 +104,6 @@ body {
 	}
 }
 
-h3 {
+/* h3 {
     color: blue;
-}
+} */

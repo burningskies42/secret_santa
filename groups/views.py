@@ -2,12 +2,16 @@ from loguru import logger
 from flask import Blueprint, render_template, request
 from flask_login import login_required
 
-from utils import assign_all_santas, assign_santa_to_target
-from . import db
+from secret_santa.utils import assign_all_santas, assign_santa_to_target
+from secret_santa import db
 
 
 # start application definitions
-groups = Blueprint("groups", __name__)
+groups = Blueprint(
+    "groups",
+    __name__,
+    template_folder="templates"
+)
 
 
 @groups.route("/groups/create/user/<int:user_id>")

@@ -18,15 +18,33 @@
                     </div>
 
                     <div class="navbar-item navbar-end dropdown is-hoverable">
+                        {% if current_user.is_authenticated %}
                         <div class="dropdown-trigger">
                             <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                            <span>
-                                {% if current_user.is_authenticated %}
-                                {{current_user.name.capitalize()}}
-                                {% else %}
-                                Login / Register
-                                {% endif %}
+                            <span>{{current_user.name}}</span>
+                            <span class="icon is-small">
+                                <i class="fas fa-angle-down" aria-hidden="true"></i>
                             </span>
+                            </button>
+                        </div>
+                        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                            <div class="dropdown-content">
+                                <a href="{{ url_for('users.profile') }}" class="dropdown-item">
+                                    Profile
+                                </a>
+                                <a href="{{ url_for('users.edit') }}" class="dropdown-item">
+                                    Settings
+                                </a>
+                                <hr class="dropdown-divider">
+                                <a href="{{ url_for('auth.logout') }}" class="dropdown-item">
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="dropdown-trigger">
+                            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                            <span>Login / Register</span>
                             <span class="icon is-small">
                                 <i class="fas fa-angle-down" aria-hidden="true"></i>
                             </span>
@@ -41,17 +59,27 @@
                                 <a href="{{ url_for('auth.login') }}" class="dropdown-item">
                                     Login
                                 </a>
-                                <a href="{{ url_for('auth.logout') }}" class="dropdown-item">
-                                    Logout
-                                </a>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </nav>
         <div class="content-wrap">
             <div class="container">
+                <h2 class="title">{{title}}</h2>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                <br>
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="notification {{ category }} is-light">
+                    <button class="delete"></button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
                 {% block content %}{% endblock %}
             </div>
         </div>
