@@ -1,23 +1,25 @@
 {% extends "main.html" %}
 {% block content %}
-<div class="column is-4 is-offset-0">
-  <form method="POST" action="{{ url_for('users.signup') }}">
+<div>
+    Please enter a name!
+    <form method="POST" action="{{ url_for('groups.create') }}">
     {{ form.hidden_tag() }}
     {% for field in form if field.widget.input_type != "hidden" %}
     <p>
-        {{ field.label }} <br>
+        {{ field.label }}
+        <br>
         {{ field }}
         <span>
-          {% if field.errors %}
+            {% if field.errors %}
             {% for error in field.errors %}
-              {{ error }}
+                {{ error }}
             {% endfor %}
-          {% endif %}
+            {% endif %}
         </span>
-      </p>
-      <br>
+    </p>
+    <br>
     {% endfor %}
     <input type="submit" value="Enter">
-  </form>
+    </form>
 </div>
 {% endblock %}

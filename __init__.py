@@ -14,7 +14,6 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    # app.config["SECRET_KEY"] = os.environ
     app.secret_key = os.getenv("SECRET_KEY") or os.urandom(24)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///santa.sqlite"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -22,7 +21,10 @@ def create_app():
 
     if os.environ.get("RESET_DB") == "1":
         with app.app_context():
+            from secret_santa.models import Users, Groups, Members
             db.create_all()
+            db.session.commit()
+
 
     # register blueprints
     from secret_santa.templates.views import main as main_blueprint
@@ -38,6 +40,7 @@ def create_app():
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
+
     @login_manager.user_loader
     def load_user(user_id):
         from secret_santa.models import User
@@ -47,9 +50,10 @@ def create_app():
     limiter = Limiter(
         app,
         key_func=get_remote_address,
-        default_limits=["1/second"]
+        default_limits=["5/second"]
     )
     limiter.limit("60/hour")(auth_blueprint)
+
 
     # Redirect all non existent URLsto index.html
     @app.errorhandler(404)

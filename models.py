@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from . import db
+from secret_santa import db
 
 
 class User(db.Model, UserMixin):
@@ -27,6 +27,17 @@ class Group(db.Model):
 
     def __repr__(self):
         return f"<Group {self.name}>"
+
+
+class Member(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    group_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
+    is_owner = db.Column(db.Boolean)
+
+    def __repr__(self):
+        return f"User.id <{self.user_id}> is member of group.id <{self.group_id}>"
 
 
 class Address(db.Model):
