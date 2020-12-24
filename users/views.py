@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from secret_santa.users.forms import UserForm, DeleteForm
+from secret_santa.users.forms import UserForm, UserEditForm, DeleteForm
 from secret_santa.models import User, Address
 from secret_santa import db
 
@@ -65,29 +65,34 @@ def edit():
     logger.warning(f"id: {current_user.id}")
     found_user = User.query.get(current_user.id)
     # prefill edit form
-    form = UserForm(obj=found_user)
+    form = UserEditForm(obj=found_user)
     return render_template('users/user_edit.html', user=found_user, form=form)
 
 
-@users.route("/edit", methods=['PATCH'])
+@users.route("/edit", methods=['POST'])
 @login_required
 def edit_patch():
     user = User.query.get(current_user.id)
     #TODO: create EditForm() and adapt it here
-    form = UserForm(request.form)
+    form = UserEditForm(request.form)
+    # from IPython import embed; embed()
     if form.validate():
         # normal edit logic
-        user.name = form.data.name
-        user.address = form.data.address
-        user.email = form.data.email
+        user.name = form.data["name"]
+        user.email = form.data["email"]
+
+        address = Address().query.filter_by(user_id=user.id).first()
+        address.description = form.data["address"]
+        user.address = address
         db.session.add(user)
+        db.session.add(address)
         db.session.commit()
         flash('Edited Successfully!', "is-success")
-        return redirect(url_for('index'))
+        return redirect(url_for('users.profile'))
     else:
         # if we fail to edit, show the edit page again with error messages and values that the user has typed in!
         flash("Could not edit user!", "is-danger")
-        return render_template('users/user_edit.html', title="Update User", form=form)
+        return render_template('users/user_edit.html', user=user, address=user.address, form=form)
 
 
 @users.route("/delete", methods=['DELETE'])
