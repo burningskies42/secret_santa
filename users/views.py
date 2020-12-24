@@ -47,9 +47,6 @@ def signup_post():
             address=new_address
         )
         
-        # from IPython import embed; embed()
-        # new_address.users.append(new_user)
-
         # add the new user to the database
         db.session.add(new_user)
         db.session.add(new_address)
