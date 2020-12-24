@@ -3,7 +3,7 @@
 <div class="column is-4 is-offset-0">
   <form method="POST" action="/edit">
     {{ form.hidden_tag() }}
-    {% for field in form if field.widget.input_type != "hidden" and field.label != "password" %}
+    {% for field in form if field.widget.input_type != "hidden" and field.name != "password" %}
     <p>
         {{ field.label }} <br>
         {{ field }}
