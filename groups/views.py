@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 from secret_santa.utils import assign_all_santas, assign_santa_to_target
 
 from secret_santa import db
-from secret_santa.models import Groups, Users, Members
+from secret_santa.models import Group, User, Member
 from secret_santa.groups.forms import GroupForm, DeleteForm
 
 
@@ -20,8 +20,8 @@ groups = Blueprint(
 @groups.route("/")
 def index():
     groups = []
-    for group in Groups.query.all():
-        owner = Users.query.filter_by(id=group.owner_id).first()
+    for group in Group.query.all():
+        owner = User.query.filter_by(id=group.owner_id).first()
         groups.append((group, owner.name))
 
     return render_template("groups/index.html", title="Groups", groups=groups)
@@ -33,22 +33,23 @@ def create():
     group_form = GroupForm()
     return render_template("groups/create.html", form=group_form)
 
+
 @groups.route("/create", methods=["POST"])
 @login_required
 def create_post():
     logger.debug(request.form)
-    group = Groups.query.filter_by(name=request.form.get("name")).first()
+    group = Group.query.filter_by(name=request.form.get("name")).first()
     if group:
         flash("Group name is already in use.", "is-warning")
         return redirect(url_for('groups.create'))
 
     group_form = GroupForm(request.form)
     if group_form.validate():
-        db.session.add(Groups(name=request.form.get("name"), owner_id=current_user.id))
+        db.session.add(Group(name=request.form.get("name"), owner_id=current_user.id))
         db.session.commit()
 
-        group = Groups.query.filter_by(name=request.form.get("name")).first()
-        db.session.add(Members(group_id=group.id, user_id=current_user.id, is_owner=True))
+        group = Group.query.filter_by(name=request.form.get("name")).first()
+        db.session.add(Member(group_id=group.id, user_id=current_user.id, is_owner=True))
         db.session.commit()
 
         flash("Successfully created Group!", "is-success")
@@ -61,7 +62,7 @@ def create_post():
 @groups.route("/<int:group_id>/delete")
 @login_required
 def delete(group_id):
-    found_group = Groups.query.get(group_id)
+    found_group = Group.query.get(group_id)
     if found_group:
         db.session.delete(found_group)
         db.session.commit()
@@ -75,14 +76,14 @@ def delete(group_id):
 
 @groups.route("/<int:group_id>/profile")
 def profile(group_id):
-    found_group = Groups.query.get(group_id)
+    found_group = Group.query.get(group_id)
     if not found_group:
         flash("Could not find Group!", "is-warning")
         redirect(url_for('groups.index'))
 
     users = []
-    for member in Members.query.filter_by(group_id=group_id).all():
-        users.append((Users.query.get(member.user_id), member.is_owner))
+    for member in Member.query.filter_by(group_id=group_id).all():
+        users.append((User.query.get(member.user_id), member.is_owner))
 
     return render_template("groups/profile.html", group=found_group, users=users)
 
@@ -90,16 +91,16 @@ def profile(group_id):
 @groups.route("/<int:group_id>/join")
 @login_required
 def join(group_id):
-    found_group = Groups.query.get(group_id)
+    found_group = Group.query.get(group_id)
     if not found_group:
         flash("Could not find group!", "is-warning")
         return redirect(url_for('groups.index'))
 
-    if Members.query.filter_by(group_id=group_id, user_id=current_user.id).first():
+    if Member.query.filter_by(group_id=group_id, user_id=current_user.id).first():
         flash("You are already a member of this group!", "is-warning")
         return redirect(url_for('groups.profile', group_id=group_id))
 
-    db.session.add(Members(group_id=found_group.id, user_id=current_user.id, is_owner=False))
+    db.session.add(Member(group_id=found_group.id, user_id=current_user.id, is_owner=False))
     db.session.commit()
 
     flash("Successfully joined group!", "is-success")
