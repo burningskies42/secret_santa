@@ -16,7 +16,8 @@ def login():
 @auth.route("/login", methods=["POST"])
 def login_post():
     remember = True if request.form.get("remember") else False
-    user = User.query.filter_by(email=request.form.get("email")).first()
+    email = str.lower(request.form.get("email"))
+    user = User.query.filter_by(email=email).first()
     if not user or not check_password_hash(user.password, request.form.get("password")):
         flash("Please check your login details and try again.", "is-danger")
         return redirect(url_for("auth.login"))
