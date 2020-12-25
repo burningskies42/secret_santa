@@ -1,7 +1,27 @@
 {% extends "main.html" %}
 {% block content %}
 <div>
-    <form action="" method="POST">
+    <form action="{{ url_for('auth.login_post') }}" method="POST" > 
+        <!-- ?_method=PATCH  -->
+        {{ form.hidden_tag() }}
+        {% for field in form if field.widget.input_type != "hidden"%}
+        <p>
+            {{ field.label }} <br>
+            {{ field }}
+            <span>
+              {% if field.errors %}
+                {% for error in field.errors %}
+                  {{ error }}
+                {% endfor %}
+              {% endif %}
+            </span>
+          </p>
+          <br>
+        {% endfor %}
+        <input type="submit" value="Login">
+      </form>
+    <!-- <form action="" method="POST">
+        {{ form.hidden_tag() }}
         <input type="text" placeholder="Email" name="email" value="{{ request.form.user_login }}"><br><br>
         <input type="password" placeholder="Password" name="password" value="{{ request.form.user_password }}">
         <br>
@@ -12,6 +32,6 @@
                 <input type="checkbox"> Remember me
             </label>
         </div>
-    </form>
+    </form> -->
 </div>
 {% endblock %}
