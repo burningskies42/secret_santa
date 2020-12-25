@@ -1,11 +1,10 @@
 import random
 import string
+from functools import wraps
 
+from flask import Response, request
 from loguru import logger
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from functools import wraps
-from flask import request, Response
 
 from .db import Connection
 from .tasks import get_ts
@@ -14,10 +13,9 @@ from .tasks import get_ts
 def login_attempts_for_ip(ip_address, minutes):
     with Connection("santa.db") as conn:
         last_minutes = f"-{minutes} minutes"
-        ret = conn.query(
-            "select count(*) CNT from logins where ip_address = ? and createdts >= datetime('now', ?)",
-            (ip_address, last_minutes, )
-        )[0]["CNT"]
+        ret = conn.query("select count(*) CNT from logins where ip_address = ? and createdts >= datetime('now', ?)", (ip_address, last_minutes,))[
+            0
+        ]["CNT"]
 
     return ret
 
@@ -26,8 +24,13 @@ def log_login_attempt(ip_address, login_name):
     with Connection("santa.db") as conn:
         conn.execute(
             "INSERT INTO logins(ip_address, login, createdts) VALUES (?, ?, ?)",
-            (ip_address, login_name, get_ts(),)
+            (
+                ip_address,
+                login_name,
+                get_ts(),
+            ),
         )
+
 
 def add_user(request_form):
     necessary_fields = {"name", "address", "login", "password"}
@@ -60,12 +63,29 @@ def add_user(request_form):
         # add user to table
         add_user_query = open("sqls/add_user.sql", "r").read()
         is_admin = True if user_id == 1 else False
-        conn.execute(add_user_query, (user_id, name, login, generate_password_hash(password), get_ts(), is_admin,))
+        conn.execute(
+            add_user_query,
+            (
+                user_id,
+                name,
+                login,
+                generate_password_hash(password),
+                get_ts(),
+                is_admin,
+            ),
+        )
 
         # add address to table
         add_address_query = open("sqls/add_address.sql", "r").read()
         try:
-            conn.execute(add_address_query, (user_id, address, get_ts(),))
+            conn.execute(
+                add_address_query,
+                (
+                    user_id,
+                    address,
+                    get_ts(),
+                ),
+            )
         except Exception as e:
             logger.error(e)
             conn.rollback()
@@ -107,7 +127,14 @@ def log_in_user(user_login, user_password, request_ip):
 
             letters_and_digits = string.ascii_letters + string.digits
             hashed = "".join((random.choice(letters_and_digits) for i in range(64)))
-            conn.query("UPDATE users SET COOKIE = ?, COOKIE_VALID_TO = ? WHERE USER_LOGIN = ?", (hashed, get_ts(offset=60), user_login,))
+            conn.query(
+                "UPDATE users SET COOKIE = ?, COOKIE_VALID_TO = ? WHERE USER_LOGIN = ?",
+                (
+                    hashed,
+                    get_ts(offset=60),
+                    user_login,
+                ),
+            )
             conn.commit()
 
             cookies["user_cookie"] = hashed
@@ -116,21 +143,25 @@ def log_in_user(user_login, user_password, request_ip):
 
         return result, cookies
 
+
 def check_auth(username, password, remote_addr):
     """This function is called to check if a username /
     password combination is valid.
     """
     msg, cookies = login_user(username, password, remote_addr)
     logger.debug(cookies)
-    check = ("successfully logged in" in msg ) and (cookies["admin_cookie"] == 1)
+    check = ("successfully logged in" in msg) and (cookies["admin_cookie"] == 1)
     return check
+
 
 def authenticate():
     """Sends a 401 response that enables basic auth"""
     return Response(
-    'Could not verify your access level for that URL.\n'
-    'You have to login with proper credentials', 401,
-    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+        "Could not verify your access level for that URL.\n" "You have to login with proper credentials",
+        401,
+        {"WWW-Authenticate": 'Basic realm="Login Required"'},
+    )
+
 
 def requires_auth(f):
     @wraps(f)
@@ -139,4 +170,5 @@ def requires_auth(f):
         if not auth or not check_auth(auth.username, auth.password, request.remote_addr):
             return authenticate()
         return f(*args, **kwargs)
+
     return decorated

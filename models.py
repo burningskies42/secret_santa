@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+
 from secret_santa import db
 
 
@@ -9,11 +10,12 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(1000))
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
-    address = db.relationship("Address", 
-        # backref="user", 
-        backref=db.backref('user', lazy=True),
-        lazy=True, 
-        uselist=False
+    address = db.relationship(
+        "Address",
+        # backref="user",
+        backref=db.backref("user", lazy=True),
+        lazy=True,
+        uselist=False,
     )
 
     def __repr__(self):

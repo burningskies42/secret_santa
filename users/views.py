@@ -1,18 +1,13 @@
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 from loguru import logger
-from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from secret_santa.users.forms import UserForm, UserEditForm, DeleteForm
-from secret_santa.models import User, Address
 from secret_santa import db
+from secret_santa.models import Address, User
+from secret_santa.users.forms import DeleteForm, UserEditForm, UserForm
 
-
-users = Blueprint(
-    "users",
-    __name__,
-    template_folder="templates"
-)
+users = Blueprint("users", __name__, template_folder="templates")
 
 
 # Routes for handling user specific pages
@@ -22,38 +17,37 @@ def profile():
     return render_template("users/index.html", title=f"Hello {current_user.name}!")
 
 
-@users.route('/new')
+@users.route("/new")
 def signup():
     user_form = UserForm()
     return render_template("users/signup.html", form=user_form)
 
-@users.route('/new', methods=['POST'])
+
+@users.route("/new", methods=["POST"])
 def signup_post():
     user = User.query.filter_by(email=request.form.get("email")).first()
     if user:
         flash("Email address already exists", "is-warning")
-        return redirect(url_for('users.signup'))
+        return redirect(url_for("users.signup"))
 
     user_form = UserForm(request.form)
     if user_form.validate():
-        new_address = Address(
-            description=request.form.get("address")
-        )
+        new_address = Address(description=request.form.get("address"))
 
         new_user = User(
             name=request.form.get("name"),
             email=request.form.get("email"),
-            password=generate_password_hash(request.form.get("password"), method='sha256'),
-            address=new_address
+            password=generate_password_hash(request.form.get("password"), method="sha256"),
+            address=new_address,
         )
-        
+
         # add the new user to the database
         db.session.add(new_user)
         db.session.add(new_address)
         db.session.commit()
 
         flash("Successfully created user. Please log in!", "is-success")
-        return redirect(url_for('auth.login'))
+        return redirect(url_for("auth.login"))
     else:
         flash("Couldn't create user. Please check the inputs!", "is-warning")
         return render_template("users/signup.html", form=user_form)
@@ -66,14 +60,14 @@ def edit():
     found_user = User.query.get(current_user.id)
     # prefill edit form
     form = UserEditForm(obj=found_user)
-    return render_template('users/user_edit.html', user=found_user, form=form)
+    return render_template("users/user_edit.html", user=found_user, form=form)
 
 
-@users.route("/edit", methods=['POST'])
+@users.route("/edit", methods=["POST"])
 @login_required
 def edit_patch():
     user = User.query.get(current_user.id)
-    #TODO: create EditForm() and adapt it here
+    # TODO: create EditForm() and adapt it here
     form = UserEditForm(request.form)
     # from IPython import embed; embed()
     if form.validate():
@@ -87,15 +81,15 @@ def edit_patch():
         db.session.add(user)
         db.session.add(address)
         db.session.commit()
-        flash('Edited Successfully!', "is-success")
-        return redirect(url_for('users.profile'))
+        flash("Edited Successfully!", "is-success")
+        return redirect(url_for("users.profile"))
     else:
         # if we fail to edit, show the edit page again with error messages and values that the user has typed in!
         flash("Could not edit user!", "is-danger")
-        return render_template('users/user_edit.html', user=user, address=user.address, form=form)
+        return render_template("users/user_edit.html", user=user, address=user.address, form=form)
 
 
-@users.route("/delete", methods=['DELETE'])
+@users.route("/delete", methods=["DELETE"])
 @login_required
 def delete():
     found_user = User.query.get(current_user.id)
