@@ -5,7 +5,11 @@ from flask_login import login_required, current_user
 from secret_santa.utils import assign_all_santas, assign_santa_to_target
 
 from secret_santa import db
+<<<<<<< HEAD
 from secret_santa.models import Group, User, Member, Santa
+=======
+from secret_santa.models import Group, User, Member
+>>>>>>> master
 from secret_santa.groups.forms import GroupForm, DeleteForm
 
 
@@ -32,6 +36,7 @@ def index():
 def create():
     group_form = GroupForm()
     return render_template("groups/create.html", form=group_form)
+
 
 @groups.route("/create", methods=["POST"])
 @login_required
