@@ -6,7 +6,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_wtf.csrf import CSRFProtect
 
 # init SQLAlchemy
 db = SQLAlchemy()
@@ -14,6 +14,7 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
+    csrf = CSRFProtect(app)
     app.secret_key = os.getenv("SECRET_KEY") or os.urandom(24)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///santa.sqlite"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
