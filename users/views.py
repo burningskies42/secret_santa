@@ -25,7 +25,8 @@ def signup():
 
 @users.route("/new", methods=["POST"])
 def signup_post():
-    user = User.query.filter_by(email=request.form.get("email")).first()
+    email = str.lower(request.form.get("email"))
+    user = User.query.filter_by(email=email).first(email)
     if user:
         flash("Email address already exists", "is-warning")
         return redirect(url_for("users.signup"))
@@ -36,7 +37,7 @@ def signup_post():
 
         new_user = User(
             name=request.form.get("name"),
-            email=request.form.get("email"),
+            email=str.lower(request.form.get("email")),
             password=generate_password_hash(request.form.get("password"), method="sha256"),
             address=new_address,
         )
@@ -73,7 +74,7 @@ def edit_patch():
     if form.validate():
         # normal edit logic
         user.name = form.data["name"]
-        user.email = form.data["email"]
+        user.email = str.lower(form.data["email"])
 
         address = Address().query.filter_by(user_id=user.id).first()
         address.description = form.data["address"]
