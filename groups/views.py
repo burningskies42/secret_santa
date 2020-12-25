@@ -6,7 +6,7 @@ from secret_santa.utils import assign_all_santas, assign_santa_to_target
 
 from secret_santa import db
 from secret_santa.models import Group, User, Member
-from secret_santa.groups.forms import GroupForm, DeleteForm
+from secret_santa.groups.forms import GroupCreateForm, GroupDeleteForm
 
 
 # start application definitions
