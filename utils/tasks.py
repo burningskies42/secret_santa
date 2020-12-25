@@ -2,7 +2,10 @@ from datetime import datetime, timedelta
 from random import randrange
 
 from loguru import logger
+from secret_santa import db
+from secret_santa.models import Member, Santa
 
+#TODO: remove unneeded imports and functionality
 from .db import Connection
 
 def enable_draw(enable):
@@ -52,22 +55,15 @@ def assign_santa_to_target(user_login):
         return None, None
 
 
-def assign_all_santas():
-    query = "INSERT INTO SANTAS(SANTA_ID, TARGET_ID, CREATEDTS) VALUES(?, ?, current_timestamp)"
+def assign_all_santas(group_id):
+    found_members = Member.query.filter_by(group_id=group_id).all()
+    member_ids = [memb.user_id for memb in found_members]
+    santa_ids = sattolo_cycle(member_ids)
+    logger.debug(f"assignments: {[member_ids, santa_ids]}")
 
-    with Connection("santa.db") as conn:
-        entries_in_santas = conn.query("SELECT COUNT(*) CNT FROM SANTAS")[0]["CNT"]
-        logger.debug(f"entries_in_santas: {entries_in_santas}")
-        entries_in_users = conn.query("SELECT COUNT(*) CNT FROM USERS")[0]["CNT"]
-        logger.debug(f"entries_in_users: {entries_in_users}")
-
-        if entries_in_santas < entries_in_users:
-            users = [d["USER_ID"] for d in conn.query("SELECT USER_ID FROM USERS")]
-            santas = sattolo_cycle(users)
-            logger.debug([santas, users])
-            [conn.execute(query, (s, u,)) for s, u in zip(santas, users)]
-        else:
-            logger.debug("Already assigned santas")
+    for member_id, santa_id in zip(member_ids, santa_ids):
+        db.session.add(Santa(group_id=group_id, presentee_id=member_id, santa_id=santa_id))
+    db.session.commit()
 
 
 def sattolo_cycle(items):
@@ -78,24 +74,5 @@ def sattolo_cycle(items):
         i = i - 1
         j = randrange(i)  # 0 <= j <= i-1
         new_items[j], new_items[i] = new_items[i], new_items[j]
+
     return new_items
-
-
-def reset_database():
-    sql_files = [
-        "drop_tables.sql",
-        "create_table_users.sql",
-        "create_table_santas.sql",
-        "create_table_addresses.sql",
-        "create_table_logins.sql"
-    ]
-
-    with Connection("santa.db") as conn:
-        for sql in sql_files:
-            with open(f"sqls/{sql}", "r") as f:
-                for query in f.read().split(";"):
-                    conn.query(query)
-                logger.debug(f"'{sql}' executed")
-
-    return True
-

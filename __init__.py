@@ -21,7 +21,7 @@ def create_app():
 
     if os.environ.get("RESET_DB") == "1":
         with app.app_context():
-            from secret_santa.models import Users, Groups, Members
+            from secret_santa.models import User, Group, Member
             db.create_all()
             db.session.commit()
 

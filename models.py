@@ -8,10 +8,10 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(1000))
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
-    address = db.relationship("Address", 
-        # backref="user", 
+    address = db.relationship("Address",
+        # backref="user",
         backref=db.backref('users', lazy=True),
-        lazy=True, 
+        lazy=True,
         uselist=False
     )
 
@@ -38,6 +38,17 @@ class Member(db.Model):
 
     def __repr__(self):
         return f"User.id <{self.user_id}> is member of group.id <{self.group_id}>"
+
+
+class Santa(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    group_id = db.Column(db.Integer)
+    presentee_id = db.Column(db.Integer)
+    santa_id = db.Column(db.Integer)
+
+    def __repr__(self):
+        return f"Santa.id <{self.santa_id}> => User.id <{self.presentee_id}>, are member of group.id <{self.group_id}>"
 
 
 class Address(db.Model):
