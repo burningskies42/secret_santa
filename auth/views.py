@@ -2,6 +2,8 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user
 from werkzeug.security import check_password_hash
 
+from secret_santa.auth.forms import LoginForm
+
 from ..models import User
 
 auth = Blueprint("auth", __name__, template_folder="templates")
@@ -10,7 +12,8 @@ auth = Blueprint("auth", __name__, template_folder="templates")
 # Routes for handling the signup/login/logout pages
 @auth.route("/login")
 def login():
-    return render_template("auth/login.html", title="Login")
+    login_form = LoginForm()
+    return render_template("auth/login.html", title="Login", form=login_form)
 
 
 @auth.route("/login", methods=["POST"])

@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from loguru import logger
 
 from secret_santa import db
-from secret_santa.groups.forms import DeleteForm, GroupForm
+from secret_santa.groups.forms import GroupCreateForm, GroupDeleteForm
 from secret_santa.models import Group, Member, User
 from secret_santa.utils import assign_all_santas, assign_santa_to_target
 
@@ -24,7 +24,7 @@ def index():
 @groups.route("/create")
 @login_required
 def create():
-    group_form = GroupForm()
+    group_form = GroupCreateForm()
     return render_template("groups/create.html", form=group_form)
 
 
@@ -37,7 +37,7 @@ def create_post():
         flash("Group name is already in use.", "is-warning")
         return redirect(url_for("groups.create"))
 
-    group_form = GroupForm(request.form)
+    group_form = GroupCreateForm(request.form)
     if group_form.validate():
         db.session.add(Group(name=request.form.get("name"), owner_id=current_user.id))
         db.session.commit()

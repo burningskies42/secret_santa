@@ -1,0 +1,11 @@
+{% extends "main.html" %}
+{% block content %}
+<div>
+    <form action="{{ url_for('users.delete_post') }}" method="POST">
+      <input type="hidden" name="user_id" value="{{ found_user.id }}"/>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token()}}"/>
+      <br><br>
+      <input type="submit"  value="Yes">
+    </form>
+</div>
+{% endblock %}

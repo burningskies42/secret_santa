@@ -23,6 +23,20 @@ use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 160
 
+[tool.pylint.MESSAGE_CONTROL]
+disable="""
+    bad-continuation,
+    no-else-return,
+    too-few-public-methods,
+    line-too-long,
+    duplicate-code,
+    import-error,
+    unused-argument,
+    no-self-use,
+    import-outside-toplevel,
+    fixme
+"""
+
 [tool.pylint.messages_control]
 disable = "C0330, C0326"
 

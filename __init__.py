@@ -5,6 +5,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
 from loguru import logger
 
 # init SQLAlchemy
@@ -13,6 +14,7 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
+    CSRFProtect(app)
     app.secret_key = os.getenv("SECRET_KEY") or os.urandom(24)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///santa.sqlite"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -20,7 +22,7 @@ def create_app():
 
     if os.environ.get("RESET_DB") == "1":
         with app.app_context():
-            from secret_santa.models import Address, Group, Member, User
+            from secret_santa.models import Address, Group, Member, User  # noqa: F811
 
             db.create_all()
             db.session.commit()
@@ -45,7 +47,7 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        from secret_santa.models import User
+        from secret_santa.models import User  # noqa: F811
 
         return User.query.get(int(user_id))
 
