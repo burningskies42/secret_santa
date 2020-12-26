@@ -8,6 +8,7 @@ from secret_santa.models import Member, Santa
 #TODO: remove unneeded imports and functionality
 from .db import Connection
 
+
 def enable_draw(enable):
     if enable:
         return ""
@@ -40,7 +41,13 @@ def get_free_santas():
 def get_free_targets(exclude_id):
     query = open("sqls/free_targets.sql", "r").read()
     with Connection("santa.db") as conn:
-        return conn.query_dataframe(query, (exclude_id, exclude_id,)).set_index("USER_ID")
+        return conn.query_dataframe(
+            query,
+            (
+                exclude_id,
+                exclude_id,
+            ),
+        ).set_index("USER_ID")
 
 
 def assign_santa_to_target(user_login):

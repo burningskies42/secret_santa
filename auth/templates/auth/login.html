@@ -1,17 +1,23 @@
 {% extends "main.html" %}
 {% block content %}
 <div>
-    <form action="" method="POST">
-        <input type="text" placeholder="Email" name="email" value="{{ request.form.user_login }}"><br><br>
-        <input type="password" placeholder="Password" name="password" value="{{ request.form.user_password }}">
-        <br>
-        <br>
-        <button class="button" style="float:left; margin:10px" >Login</button>
-        <div class="field">
-            <label class="checkbox" style="float:left; margin:10px" >
-                <input type="checkbox"> Remember me
-            </label>
-        </div>
-    </form>
+    <form action="{{ url_for('auth.login_post') }}" method="POST" >
+        {{ form.hidden_tag() }}
+        {% for field in form if field.widget.input_type != "hidden"%}
+        <p>
+            {{ field.label }} <br>
+            {{ field }}
+            <span>
+              {% if field.errors %}
+                {% for error in field.errors %}
+                  {{ error }}
+                {% endfor %}
+              {% endif %}
+            </span>
+          </p>
+          <br>
+        {% endfor %}
+        <input type="submit" value="Login">
+      </form>
 </div>
 {% endblock %}
