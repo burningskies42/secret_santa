@@ -4,20 +4,41 @@ repos:
     hooks:
     - id: trailing-whitespace
     - id: end-of-file-fixer
+    - id: check-merge-conflict
+    - id: check-executables-have-shebangs
+
+  - repo: https://github.com/psf/black
+    rev: 20.8b1
+    hooks:
+    - id: black
+      language_version: python3
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.5.2
+    hooks:
+    - id: isort
 
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
     - id: flake8
-      additional_dependencies: [flake8-typing-imports==1.7.0]
+      additional_dependencies: [flake8-typing-imports==1.10.0]
 
-  - repo: https://github.com/psf/black
-    rev: 19.10b0
+  - repo: https://github.com/pre-commit/mirrors-autopep8
+    rev: v1.5.4
     hooks:
-      - id: black
-        language_version: python3
+    - id: autopep8
 
-  - repo: https://github.com/pycqa/isort
-    rev: 5.5.2
+  - repo: https://github.com/pre-commit/pre-commit
+    rev: v2.9.3
     hooks:
-      - id: isort
+    - id: validate_manifest
+
+  # - repo: local
+  #   hooks:
+  #     - id: pylint
+  #       name: pylint
+  #       entry: pylint
+  #       language: system
+  #       types: [python]
+  #       exclude: "[a-zA-Z]*/(migrations|tests)/(.)*"

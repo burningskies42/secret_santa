@@ -19,8 +19,7 @@ class Connection:
             logger.error(e)
 
     def disconnect(self):
-        """terminate database connection
-        """
+        """terminate database connection"""
         self.conn.close()
         logger.info("Closing connection")
 

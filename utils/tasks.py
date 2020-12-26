@@ -5,6 +5,7 @@ from loguru import logger
 
 from .db import Connection
 
+
 def enable_draw(enable):
     if enable:
         return ""
@@ -37,7 +38,13 @@ def get_free_santas():
 def get_free_targets(exclude_id):
     query = open("sqls/free_targets.sql", "r").read()
     with Connection("santa.db") as conn:
-        return conn.query_dataframe(query, (exclude_id, exclude_id,)).set_index("USER_ID")
+        return conn.query_dataframe(
+            query,
+            (
+                exclude_id,
+                exclude_id,
+            ),
+        ).set_index("USER_ID")
 
 
 def assign_santa_to_target(user_login):
@@ -65,7 +72,16 @@ def assign_all_santas():
             users = [d["USER_ID"] for d in conn.query("SELECT USER_ID FROM USERS")]
             santas = sattolo_cycle(users)
             logger.debug([santas, users])
-            [conn.execute(query, (s, u,)) for s, u in zip(santas, users)]
+            [
+                conn.execute(
+                    query,
+                    (
+                        s,
+                        u,
+                    ),
+                )
+                for s, u in zip(santas, users)
+            ]
         else:
             logger.debug("Already assigned santas")
 
@@ -82,13 +98,7 @@ def sattolo_cycle(items):
 
 
 def reset_database():
-    sql_files = [
-        "drop_tables.sql",
-        "create_table_users.sql",
-        "create_table_santas.sql",
-        "create_table_addresses.sql",
-        "create_table_logins.sql"
-    ]
+    sql_files = ["drop_tables.sql", "create_table_users.sql", "create_table_santas.sql", "create_table_addresses.sql", "create_table_logins.sql"]
 
     with Connection("santa.db") as conn:
         for sql in sql_files:
@@ -98,4 +108,3 @@ def reset_database():
                 logger.debug(f"'{sql}' executed")
 
     return True
-
