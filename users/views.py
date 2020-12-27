@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from secret_santa import db
 from secret_santa.models import Address, User
-from secret_santa.users.forms import UserCreateForm, UserDeleteForm, UserEditForm, UserForm
+from secret_santa.users.forms import UserCreateForm, UserDeleteForm, UserEditForm
 
 users = Blueprint("users", __name__, template_folder="templates")
 
@@ -27,7 +27,8 @@ def signup():
 @users.route("/create", methods=["POST"])
 def signup_post():
     email = str.lower(request.form.get("email"))
-    user = User.query.filter_by(email=email).first(email)
+    user = User.query.filter_by(email=email).first()
+    # from IPython import embed; embed()
     if user:
         flash("Email address already exists", "is-warning")
         return redirect(url_for("users.signup"))
