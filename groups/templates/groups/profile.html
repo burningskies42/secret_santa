@@ -7,14 +7,35 @@
     <button class="button" {% if not current_user.is_authenticated %}disabled{% endif %}>
         <a href="{{ url_for('groups.join', group_id=group.id) }}">Join</a>
     </button>
+    <button class="button" {% if current_user.id != group.owner_id %}disabled{% endif %}>
+        <a href="{{ url_for('groups.raffle', group_id=group.id) }}">Raffle</a>
+    </button>
+    <button class="button is-danger" {% if current_user.id != group.owner_id %}disabled{% endif %}>
+        <a href="{{ url_for('groups.delete', group_id=group.id) }}">Delete</a>
+    </button>
 </div>
 {% if users %}
 <h2 class="title is-4">Members:</h2>
-{% for user, is_owner in users %}
+{% for user, presentee in users %}
 <ul class="box">
     <li>
-        <i class="fas fa-user"></i><strong>{{user.name}}</strong>
-        {% if is_owner %}&nbsp;(admin){% endif%}
+        <i class="fas fa-user"></i><strong>{{ user.name }} <{{ user.id }}></strong>
+        {% if user.id == group.owner_id %}&nbsp;(admin){% endif%}
+        {% if user.id == current_user.id and presentee.name %}
+        <strong>&nbsp;&nbsp;=>&nbsp;&nbsp;Presentee: {{ presentee.name }} <{{ presentee.id }}></strong>
+        {% endif %}
+        <div class="buttons is-right">
+            {% if user.id == current_user.id %}
+            <button class="button is-dark is-light is-small">
+                <a href="{{ url_for('groups.leave', group_id=group.id) }}">Leave Group</a>
+            </button>
+            {% endif %}
+            {% if group.owner_id == current_user.id %}
+            <button class="button is-danger is-light is-small">
+                <a href="{{ url_for('groups.kick', group_id=group.id, user_id=user.id) }}">Kick User</a>
+            </button>
+            {% endif %}
+        </div>
     </li>
 </ul>
 {% endfor %}

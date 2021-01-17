@@ -45,6 +45,17 @@ class Member(db.Model):
         return f"User.id <{self.user_id}> is member of group.id <{self.group_id}>"
 
 
+class Santa(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    group_id = db.Column(db.Integer)
+    presentee_id = db.Column(db.Integer)
+    santa_id = db.Column(db.Integer)
+
+    def __repr__(self):
+        return f"Santa.id <{self.santa_id}> => User.id <{self.presentee_id}>, are member of group.id <{self.group_id}>"
+
+
 class Address(db.Model):
     # __bind_key__ = 'address'
     id = db.Column(db.Integer, primary_key=True)

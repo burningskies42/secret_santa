@@ -104,6 +104,6 @@ body {
 	}
 }
 
-/* h3 {
-    color: blue;
-} */
+button a {
+    color: inherit;
+}
