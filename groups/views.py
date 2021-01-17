@@ -6,7 +6,7 @@ from secret_santa import db
 from secret_santa.models import Group, User, Member, Santa
 from secret_santa.groups.forms import GroupCreateForm, GroupDeleteForm
 from secret_santa.models import Group, Member, User, Santa
-from secret_santa.utils import assign_all_santas, assign_santa_to_target
+from secret_santa.utils import assign_all_santas
 
 
 # start application definitions
@@ -78,15 +78,16 @@ def profile(group_id):
         flash("Could not find Group!", "is-warning")
         redirect(url_for("groups.index"))
 
-    users = (
-        Member.query.filter_by(group_id=group_id)
+    users = ( Member
+        .query
+        .filter_by(group_id=group_id)
         .join(User, Member.user_id == User.id)
         .add_columns(User.id, User.name)
         .all()
     )
 
-    presentees = (
-        Member.query
+    presentees = ( Member
+        .query
         .join(Santa, Member.user_id == Santa.santa_id, isouter=True)
         .filter_by(group_id=group_id)
         .join(User, Santa.santa_id == User.id, isouter=True)
@@ -94,11 +95,10 @@ def profile(group_id):
         .all()
     )
 
-    if not presentees:
-        presentees = [None] * len(users)
-
+    presentees = presentees or [None] * len(users)
     logger.debug(f"users: {users}")
     logger.debug(f"presentees: {presentees}")
+
     return render_template("groups/profile.html", group=found_group, users=zip(users, presentees))
 
 
@@ -158,12 +158,11 @@ def kick(group_id, user_id):
 @groups.route("/<int:group_id>/raffle")
 @login_required
 def raffle(group_id):
-    found_santas = Santa.query.filter_by(group_id=group_id).first()
-    if found_santas:
+    found_group = Group.query.filter_by(id=group_id, owner_id=current_user.id).first()
+    if found_group and found_group.is_raffled:
         flash("Already raffled members!", "is-success")
         return redirect(url_for('groups.profile', group_id=group_id))
 
-    found_group = Group.query.filter_by(id=group_id, owner_id=current_user.id).first()
     if found_group:
         assign_all_santas(found_group.id)
         flash("Succesfully raffled members!", "is-success")

@@ -7,7 +7,7 @@
     <button class="button" {% if not current_user.is_authenticated %}disabled{% endif %}>
         <a href="{{ url_for('groups.join', group_id=group.id) }}">Join</a>
     </button>
-    <button class="button" {% if current_user.id != group.owner_id %}disabled{% endif %}>
+    <button class="button" {% if current_user.id != group.owner_id or group.is_raffled %}disabled{% endif %}>
         <a href="{{ url_for('groups.raffle', group_id=group.id) }}">Raffle</a>
     </button>
     <button class="button is-danger" {% if current_user.id != group.owner_id %}disabled{% endif %}>
