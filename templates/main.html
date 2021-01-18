@@ -81,7 +81,7 @@
                 {% if messages %}
                 {% for category, message in messages %}
                 <div class="notification {{ category }} is-light">
-                    <button class="delete"></button>
+                    <button class="delete" onclick="this.parentElement.style.display='none'"></button>
                     {{ message }}
                 </div>
                 {% endfor %}
@@ -95,6 +95,5 @@
                 <p>&copy; 2020 BurningSkies_1337 GmbH</p>
             </div>
         </footer>
-        <script src="{{ url_for('static', filename='javascript/BulmaJS-0.12.0/dist/bulma.js') }}"></script>
     </body>
 </html>
