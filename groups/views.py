@@ -7,7 +7,7 @@ from secret_santa.models import Group, User, Member, Santa
 from secret_santa.groups.forms import GroupCreateForm, GroupDeleteForm
 from secret_santa.models import Group, Member, User, Santa
 from secret_santa.utils import assign_all_santas, assign_santa_to_target
-
+from secret_santa.utils import delete_group
 
 # start application definitions
 groups = Blueprint("groups", __name__, template_folder="templates")
@@ -58,11 +58,7 @@ def create_post():
 def delete(group_id):
     found_group = Group.query.get(group_id)
     if found_group and current_user.id == found_group.owner_id:
-        db.session.delete(found_group)
-        found_members = Member.query.filter_by(group_id=group_id).all()
-        for member in found_members:
-            db.session.delete(member)
-        db.session.commit()
+        delete_group(found_group)
 
         flash(f"Group <{group_id}> successfully deleted!", "is-success")
         return redirect(url_for("groups.index"))
@@ -129,6 +125,11 @@ def leave(group_id):
     member = Member.query.filter_by(group_id=group_id, user_id=current_user.id).first()
     if found_group and member:
         db.session.delete(member)
+        if len(Member.query.filter_by(group_id=group_id).all()) == 0:
+            delete_group(found_group)
+            flash(f"Left Group <{group_id}> successfully!", "is-success")
+            return redirect(url_for('groups.index'))
+
         db.session.commit()
 
         flash(f"Left Group <{group_id}> successfully!", "is-success")
@@ -146,6 +147,11 @@ def kick(group_id, user_id):
     member = Member.query.filter_by(group_id=group_id, user_id=user_id).first()
     if found_group and member:
         db.session.delete(member)
+        if len(Member.query.filter_by(group_id=group_id).all()) == 0:
+            delete_group(found_group)
+            flash(f"User <{member.id}> successfully kicked from Group <{group_id}>!", "is-success")
+            return redirect(url_for('groups.index'))
+
         db.session.commit()
 
         flash(f"User <{user_id}> was kicked from Group <{group_id}>!", "is-success")

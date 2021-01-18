@@ -83,3 +83,13 @@ def sattolo_cycle(items):
         new_items[j], new_items[i] = new_items[i], new_items[j]
 
     return new_items
+
+
+def delete_group(group):
+    db.session.delete(group)
+    for member in Member.query.filter_by(group_id=group.id).all():
+        db.session.delete(member)
+    for santa in Santa.query.filter_by(group_id=group.id).all():
+        db.session.delete(santa)
+
+    db.session.commit()
