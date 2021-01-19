@@ -28,6 +28,7 @@ class Group(db.Model):
 
     name = db.Column(db.String(100), unique=True)
     owner_id = db.Column(db.Integer)
+    is_raffled = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<Group {self.name}>"
