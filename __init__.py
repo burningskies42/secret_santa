@@ -24,6 +24,11 @@ def create_app():
         with app.app_context():
             from secret_santa.models import Address, Group, Member, User  # noqa: F811
 
+            logger.debug("Reseting DB")
+            meta = db.metadata
+            for table in reversed(meta.sorted_tables):
+                db.session.execute(table.delete())
+                logger.debug(f"truncating table {table}")
             db.create_all()
             db.session.commit()
 
