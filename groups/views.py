@@ -134,6 +134,10 @@ def leave(group_id):
 @login_required
 def kick(group_id, user_id):
     found_group = Group.query.get(group_id)
+    if current_user.id != found_group.owner_id:
+        flash(f"You don't have the right to kick ither users!", "is-warning")
+        return redirect(url_for('groups.profile', group_id=group_id))
+
     logger.warning(f"group: {found_group}")
     member = Member.query.filter_by(group_id=group_id, user_id=user_id).first()
     if found_group and member:
