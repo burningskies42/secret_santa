@@ -2,8 +2,9 @@ from datetime import datetime, timedelta
 from random import randrange
 
 from loguru import logger
+
 from secret_santa import db
-from secret_santa.models import Member, Santa, Group
+from secret_santa.models import Group, Member, Santa
 
 
 def get_ts(offset=0):
@@ -35,3 +36,13 @@ def sattolo_cycle(items):
         new_items[j], new_items[i] = new_items[i], new_items[j]
 
     return new_items
+
+
+def delete_group(group):
+    db.session.delete(group)
+    for member in Member.query.filter_by(group_id=group.id).all():
+        db.session.delete(member)
+    for santa in Santa.query.filter_by(group_id=group.id).all():
+        db.session.delete(santa)
+
+    db.session.commit()

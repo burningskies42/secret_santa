@@ -3,11 +3,9 @@ from flask_login import current_user, login_required
 from loguru import logger
 
 from secret_santa import db
-from secret_santa.models import Group, User, Member, Santa
 from secret_santa.groups.forms import GroupCreateForm, GroupDeleteForm
-from secret_santa.models import Group, Member, User, Santa
-from secret_santa.utils import assign_all_santas
-
+from secret_santa.models import Group, Member, Santa, User
+from secret_santa.utils import assign_all_santas, delete_group
 
 # start application definitions
 groups = Blueprint("groups", __name__, template_folder="templates")
@@ -58,17 +56,13 @@ def create_post():
 def delete(group_id):
     found_group = Group.query.get(group_id)
     if found_group and current_user.id == found_group.owner_id:
-        db.session.delete(found_group)
-        found_members = Member.query.filter_by(group_id=group_id).all()
-        for member in found_members:
-            db.session.delete(member)
-        db.session.commit()
+        delete_group(found_group)
 
         flash(f"Group <{group_id}> successfully deleted!", "is-success")
         return redirect(url_for("groups.index"))
 
     flash(f"Could not delete Group <{group_id}>!", "is-warning")
-    return redirect(url_for('groups.profile', group_id=group_id))
+    return redirect(url_for("groups.profile", group_id=group_id))
 
 
 @groups.route("/<int:group_id>/profile")
@@ -78,17 +72,10 @@ def profile(group_id):
         flash("Could not find Group!", "is-warning")
         redirect(url_for("groups.index"))
 
-    users = ( Member
-        .query
-        .filter_by(group_id=group_id)
-        .join(User, Member.user_id == User.id)
-        .add_columns(User.id, User.name)
-        .all()
-    )
+    users = Member.query.filter_by(group_id=group_id).join(User, Member.user_id == User.id).add_columns(User.id, User.name).all()
 
-    presentees = ( Member
-        .query
-        .join(Santa, Member.user_id == Santa.santa_id, isouter=True)
+    presentees = (
+        Member.query.join(Santa, Member.user_id == Santa.santa_id, isouter=True)
         .filter_by(group_id=group_id)
         .join(User, Santa.santa_id == User.id, isouter=True)
         .add_columns(User.id, User.name)
@@ -129,13 +116,18 @@ def leave(group_id):
     member = Member.query.filter_by(group_id=group_id, user_id=current_user.id).first()
     if found_group and member:
         db.session.delete(member)
+        if len(Member.query.filter_by(group_id=group_id).all()) == 0:
+            delete_group(found_group)
+            flash(f"Left Group <{group_id}> successfully!", "is-success")
+            return redirect(url_for("groups.index"))
+
         db.session.commit()
 
         flash(f"Left Group <{group_id}> successfully!", "is-success")
-        return redirect(url_for('groups.profile', group_id=group_id))
+        return redirect(url_for("groups.profile", group_id=group_id))
 
     flash(f"Could not remove User <{current_user.id}> from Group <{group_id}>!", "is-warning")
-    return redirect(url_for('groups.profile', group_id=group_id))
+    return redirect(url_for("groups.profile", group_id=group_id))
 
 
 @groups.route("/<int:group_id>/kick/<int:user_id>")
@@ -146,13 +138,18 @@ def kick(group_id, user_id):
     member = Member.query.filter_by(group_id=group_id, user_id=user_id).first()
     if found_group and member:
         db.session.delete(member)
+        if len(Member.query.filter_by(group_id=group_id).all()) == 0:
+            delete_group(found_group)
+            flash(f"User <{member.id}> successfully kicked from Group <{group_id}>!", "is-success")
+            return redirect(url_for("groups.index"))
+
         db.session.commit()
 
         flash(f"User <{user_id}> was kicked from Group <{group_id}>!", "is-success")
-        return redirect(url_for('groups.profile', group_id=group_id))
+        return redirect(url_for("groups.profile", group_id=group_id))
 
     flash(f"Could not remove User <{user_id}> from Group <{group_id}>!", "is-warning")
-    return redirect(url_for('groups.profile', group_id=group_id))
+    return redirect(url_for("groups.profile", group_id=group_id))
 
 
 @groups.route("/<int:group_id>/raffle")
@@ -161,15 +158,15 @@ def raffle(group_id):
     found_group = Group.query.filter_by(id=group_id, owner_id=current_user.id).first()
     if found_group and found_group.is_raffled:
         flash("Already raffled members!", "is-success")
-        return redirect(url_for('groups.profile', group_id=group_id))
+        return redirect(url_for("groups.profile", group_id=group_id))
 
     if found_group:
         assign_all_santas(found_group.id)
         flash("Succesfully raffled members!", "is-success")
-        return redirect(url_for('groups.profile', group_id=group_id))
+        return redirect(url_for("groups.profile", group_id=group_id))
 
     flash("Could not initiate raffle!", "is-warning")
-    return redirect(url_for('groups.profile', group_id=group_id))
+    return redirect(url_for("groups.profile", group_id=group_id))
 
 
 @groups.route("/<int:group_id>/draw")
