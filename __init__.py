@@ -10,13 +10,14 @@ from loguru import logger
 
 # init SQLAlchemy
 db = SQLAlchemy()
+PRODUCTION_SQLILE_PATH = "sqlite:///santa.sqlite"
 
 
-def create_app():
+def create_app(TEST_SQLILE_PATH=None):
     app = Flask(__name__)
     CSRFProtect(app)
     app.secret_key = os.getenv("SECRET_KEY") or os.urandom(24)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///santa.sqlite"
+    app.config["SQLALCHEMY_DATABASE_URI"] = TEST_SQLILE_PATH or PRODUCTION_SQLILE_PATH
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)
 
