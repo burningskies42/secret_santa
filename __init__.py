@@ -26,8 +26,7 @@ def create_app(TEST_SQLILE_PATH=None):
             from secret_santa.models import Address, Group, Member, User  # noqa: F811
 
             logger.debug("Reseting DB")
-            meta = db.metadata
-            for table in reversed(meta.sorted_tables):
+            for table in reversed(db.metadata.sorted_tables):
                 db.session.execute(table.delete())
                 logger.debug(f"truncating table {table}")
             db.create_all()
