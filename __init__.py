@@ -8,6 +8,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from loguru import logger
 
+MAX_CONTENT_MEGABYTE = 10
+
+
 # init SQLAlchemy
 db = SQLAlchemy()
 
@@ -18,6 +21,8 @@ def create_app():
     app.secret_key = os.getenv("SECRET_KEY") or os.urandom(24)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///santa.sqlite"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_MEGABYTE * 1024 * 1024
+
     db.init_app(app)
 
     if os.environ.get("RESET_DB") == "1":
@@ -25,10 +30,10 @@ def create_app():
             from secret_santa.models import Address, Group, Member, User  # noqa: F811
 
             logger.debug("Reseting DB")
-            meta = db.metadata
-            for table in reversed(meta.sorted_tables):
-                db.session.execute(table.delete())
-                logger.debug(f"truncating table {table}")
+            # meta = db.metadata
+            # for table in reversed(meta.sorted_tables):
+            #     db.session.execute(table.delete())
+            #     logger.debug(f"truncating table {table}")
             db.create_all()
             db.session.commit()
 

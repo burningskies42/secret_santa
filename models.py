@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(1000))
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
+    hashed_image_name = db.Column(db.String(100), default=None)
     address = db.relationship(
         "Address",
         # backref="user",

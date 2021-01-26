@@ -1,24 +1,35 @@
 {% extends "main.html" %}
 {% block content %}
-<div class="column is-4 is-offset-0">
-  <form action="{{ url_for('users.edit_post') }}" method="POST" > 
-    <!-- ?_method=PATCH  -->
-    {{ form.hidden_tag() }}
-    {% for field in form if field.widget.input_type != "hidden" and field.name != "password" %}
-    <p>
-        {{ field.label }} <br>
-        {{ field }}
-        <span>
-          {% if field.errors %}
-            {% for error in field.errors %}
-              {{ error }}
-            {% endfor %}
-          {% endif %}
-        </span>
-      </p>
-      <br>
-    {% endfor %}
-    <input type="submit" value="Enter">
-  </form>
+<div class="columns">
+  <div class="column">
+    <form action="{{ url_for('users.edit_post') }}" method="POST" >
+      {{ form.hidden_tag() }}
+      {% for field in form if field.widget.input_type != "hidden" and field.name != "password" %}
+      <p class="control">
+          {{ field.label }} <br>
+          {{ field }}
+          <span>
+            {% if field.errors %}
+              {% for error in field.errors %}
+                {{ error }}
+              {% endfor %}
+            {% endif %}
+          </span>
+        </p>
+        <br>
+      {% endfor %}
+      <input type="submit" value="Enter">
+    </form>
+  </div>
+  <div class="column">
+    <p class="control">
+      <img src="{{ url_for('users.get_profile_image') }}" height="140" width="140">
+    </p>
+    <form method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <p class="control"><input type="file" name="file"></p>
+      <p class="control"><input type="submit" value="Upload"></p>
+    </form>
+  </div>
 </div>
 {% endblock %}
