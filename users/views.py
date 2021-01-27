@@ -28,7 +28,6 @@ def signup():
 def signup_post():
     email = str.lower(request.form.get("email"))
     user = User.query.filter_by(email=email).first()
-    # from IPython import embed; embed()
     if user:
         flash("Email address already exists", "is-warning")
         return redirect(url_for("users.signup"))

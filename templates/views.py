@@ -8,6 +8,6 @@ main = Blueprint("main", __name__)
 
 
 # define routes
-@main.route("/", methods=["POST", "GET"])
+@main.route("/", methods=["GET"])
 def index():
     return render_template("home.html", title="Welcome to BestSecret Santa!")
