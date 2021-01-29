@@ -48,3 +48,11 @@ footer {
 button a {
     color: inherit;
 }
+
+.label {
+    color: white
+}
+
+.white {
+    color:rgb(255, 255, 255)
+}
