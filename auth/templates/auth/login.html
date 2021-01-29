@@ -4,16 +4,13 @@
     <form action="{{ url_for('auth.login_post') }}" method="POST" >
         {{ form.hidden_tag() }}
         {% for field in form if field.widget.input_type != "hidden"%}
-        <p>
-            {{ field.label(class_="label ") }}
-            {{ field(class_="label") }}
-            <span>
-              {% if field.errors %}
-                {% for error in field.errors %}
-                  {{ error }}
-                {% endfor %}
-              {% endif %}
-            </span>
+          <p>
+            {{ field.label(class_="label is-white-text") }}
+            {% if field.type == 'StringField' or field.type == 'PasswordField' %}
+              {{ field(class_="input column is-3") }}
+            {% else %}
+              {{ field }}
+            {% endif %}
           </p>
           <br>
         {% endfor %}

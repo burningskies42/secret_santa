@@ -1,13 +1,19 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for, send_from_directory
 from flask_login import current_user, login_required
 from flask_wtf.csrf import ValidationError, validate_csrf
+
+import os
+import hashlib
 from loguru import logger
+from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from secret_santa import db
 from secret_santa.models import Address, User
 from secret_santa.users.forms import UserCreateForm, UserDeleteForm, UserEditForm
 
+
+UPLOAD_FOLDER = "user_uploads/users"
 users = Blueprint("users", __name__, template_folder="templates")
 
 
@@ -71,9 +77,20 @@ def edit():
 def edit_post():
     user = User.query.get(current_user.id)
     form = UserEditForm(request.form)
-    # from IPython import embed; embed()
+    file = request.files['file']
+
+    if file and allowed_file(file.filename):
+        file_ending = file.filename.rsplit('.', 1)[1].lower()
+        hex_filename = hashlib.md5(secure_filename(file.filename).encode('utf-8')).hexdigest()
+        hashed_filename = f"{hex_filename}.{file_ending}"
+        file.save(os.path.join(UPLOAD_FOLDER, hashed_filename))
+
+        # update user in db
+        user.hashed_image_name = hashed_filename
+        db.session.add(user)
+        db.session.commit()
+
     if form.validate():
-        # normal edit logic
         user.name = form.data["name"]
         user.email = str.lower(form.data["email"])
 
@@ -116,3 +133,18 @@ def delete_post():
         except ValidationError:  # if someome tampers with the CSRF token when we delete an owner
             flash("Cannot delete user", "is-critical")
             return render_template("home.html")
+
+
+@users.route('/profile_image', methods=["GET"])
+@login_required
+def get_profile_image():
+    if current_user.hashed_image_name:
+        return send_from_directory(UPLOAD_FOLDER, current_user.hashed_image_name)
+
+    return send_from_directory(UPLOAD_FOLDER, "default_user.jpg")
+
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

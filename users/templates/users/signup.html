@@ -1,12 +1,12 @@
 {% extends "main.html" %}
 {% block content %}
-<div class="column is-4 is-offset-0">
+<div>
   <form method="POST" action="{{ url_for('users.signup') }}">
     {{ form.hidden_tag() }}
     {% for field in form if field.widget.input_type != "hidden" %}
     <p>
-      {{ field.label(class_="label") }}
-      {{ field(class_="input") }}
+      {{ field.label(class_="label is-white-text") }}
+      {{ field(class_="input column is-3") }}
       <span>
         {% if field.errors %}
           {% for error in field.errors %}
