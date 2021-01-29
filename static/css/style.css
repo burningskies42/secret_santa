@@ -14,10 +14,6 @@ footer {
     height: 10px;
 }
 
-.box {
-    margin: 10px;
-}
-
 .snow {
 	position: fixed;
 	pointer-events: none;
@@ -49,10 +45,10 @@ button a {
     color: inherit;
 }
 
-.label {
-    color: white
+.box {
+    margin: 10px;
 }
 
-.white {
+.is-white-text {
     color:rgb(255, 255, 255)
 }

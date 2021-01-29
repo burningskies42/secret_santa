@@ -4,7 +4,8 @@ from wtforms.validators import DataRequired, Email, Length
 
 
 class UserCreateForm(FlaskForm):
-    name = StringField("Full Name", [DataRequired(), Length(min=5, max=100, message="Name must be at least 5 characters long")])
+    first_name = StringField("Full Name", [DataRequired(), Length(min=1, max=100, message="Name must be at least 1 characters long")])
+    last_name = StringField("Full Name", [DataRequired(), Length(min=1, max=100, message="Name must be at least 1 characters long")])
     address = StringField("Address", [DataRequired(), Length(min=5, max=100, message="Address must be at least 5 characters long")])
     email = StringField("Email", [DataRequired(), Email("This field requires a valid email address")])
     password = PasswordField("Password", [DataRequired()])
