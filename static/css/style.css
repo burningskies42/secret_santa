@@ -1,80 +1,21 @@
-/* nav {
-    width: 100%;
-    float: left;
-    height: 70px;
-}
-
-nav li {
-    display: inline;
-    border: 2px;
-    border-radius: 7px;
-    padding: 10px 10px;
-    border: 2px solid black;
-    background-color: #dd1a1a;
-}
-
-nav li:hover {
-    border: 2px solid black;
-    background-color: white;
-}
-
-nav li + li {
-    margin-left: 25px;
-}
-
-nav li a {
-    color: rgba(68, 68, 68, 0.938);
-    text-decoration: none;
-}
-
-nav li.user-right {
-    color: blueviolet;
-    float: right;
-    text-decoration: none;
-}
-
-.user-icon {
-    width: 15px;
-    height: 15px;
-}
-
-.page-container {
-    position: relative;
-    min-height: 100vh;
-    margin: 0px;
-}
-
-.content-wrap {
-    background-color: #ffffff00;
-    padding-bottom: 2.5rem;
-    margin: 0 auto;
-    padding: 40px 30px 40px 30px;
-    width: 1000px;
-    min-height: 300px;
-    color: white;
-}
-
-.container {
-    width: 800px;
-    clear: both;
-} */
-
-.footer {
-    background-color:#fafafa;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 80px;
-    color: rgb(0, 0, 0);
-}
-
-.title{
-    color: rgb(255, 255, 255)
-}
-
-
 body {
-	z-index: 1;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+#wrapper {
+    flex: 1;
+    margin-bottom: 30px;
+}
+
+footer {
+    padding: 10px;
+    height: 10px;
+}
+
+.box {
+    margin: 10px;
 }
 
 .snow {
