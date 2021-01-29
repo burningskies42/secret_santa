@@ -5,6 +5,7 @@
         <title>Hello Santa!</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"/>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+        <script src="https://kit.fontawesome.com/ea65c60162.js" crossorigin="anonymous"></script>
     </header>
     <body>
         <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
@@ -12,7 +13,7 @@
                 <div id="navbarMenuHeroA" class="navbar-menu">
                     <a href="   {{ url_for('main.index') }}" class=" navbar-item">
                         <span class="icon">
-                            <i class="fas fa-home"></i>
+                            <i class="fas fa-home"></i>&nbsp;
                         </span>
                         Home
                     </a>
@@ -50,7 +51,7 @@
                         {% else %}
                         <div class="dropdown-trigger">
                             <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                            <i class="fas fa-user"></i>
+                            <i class="fas fa-user"></i>&nbsp;
                             <span>Login / Register</span>
                             <span class="icon is-small">
                                 <i class="fas fa-angle-down" aria-hidden="true"></i>
@@ -73,7 +74,7 @@
                 </div>
             </div>
         </nav>
-        <div class="content-wrap">
+        <div class="content-wrap"  id="wrapper">
             <div class="container">
                 <h2 class="title">{{title}}</h2>
                 {% with messages = get_flashed_messages(with_categories=true) %}

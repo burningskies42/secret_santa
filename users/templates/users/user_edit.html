@@ -5,9 +5,9 @@
     <form action="{{ url_for('users.edit_post') }}" method="POST" >
       {{ form.hidden_tag() }}
       {% for field in form if field.widget.input_type != "hidden" and field.name != "password" %}
-      <p class="control">
-          {{ field.label }} <br>
-          {{ field }}
+      <p>
+          {{ field.label(class_="label") }}
+          {{ field(class_="input") }}
           <span>
             {% if field.errors %}
               {% for error in field.errors %}
@@ -18,7 +18,7 @@
         </p>
         <br>
       {% endfor %}
-      <input type="submit" value="Enter">
+      <input class="button is-info" type="submit" value="Enter">
     </form>
   </div>
   <div class="column">
